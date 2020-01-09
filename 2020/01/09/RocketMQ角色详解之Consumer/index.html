@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="一、常用Consumer类 DefaultMQPushConsumer DefaultMQPullConsumer  二者的区别：DefaultMQPushConsumer：系统控制读取操作，收到消息后自动调用传入的处理方法来处理，实时性高DefaultMQPullConsumer：读取操作中的大部分功能由使用者自主控制 ，灵活性更高。 两种Consumer的选取要主要取决于用户的使用场景，适合的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="RocketMQ角色详解之Consumer">
+<meta property="og:url" content="http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E8%A7%92%E8%89%B2%E8%AF%A6%E8%A7%A3%E4%B9%8BConsumer/index.html">
+<meta property="og:site_name" content="瑞高的博客空间">
+<meta property="og:description" content="一、常用Consumer类 DefaultMQPushConsumer DefaultMQPullConsumer  二者的区别：DefaultMQPushConsumer：系统控制读取操作，收到消息后自动调用传入的处理方法来处理，实时性高DefaultMQPullConsumer：读取操作中的大部分功能由使用者自主控制 ，灵活性更高。 两种Consumer的选取要主要取决于用户的使用场景，适合的">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2020-01-09T12:32:48.000Z">
+<meta property="article:modified_time" content="2020-01-09T12:42:43.651Z">
+<meta property="article:author" content="liruigao.top">
+<meta name="twitter:card" content="summary">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="/cactus_blog/images/favicon.ico">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="/cactus_blog/images/favicon-192x192.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="/cactus_blog/images/apple-touch-icon.png">
+          
+        
+    
+    <!-- title -->
+    <title>RocketMQ角色详解之Consumer</title>
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/cactus_blog/css/style.css">
+
+    <!-- persian styles -->
+    
+      
+<link rel="stylesheet" href="/cactus_blog/css/rtl.css">
+
+    
+    <!-- rss -->
+    
+    
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="http://www.liruigao.top/index.html">主页</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/article.html">创作</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/photos.html">摄影</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/blog.html">博客</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/about.html">关于我</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/contact.html">联系我</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" href="/cactus_blog/2020/01/09/RocketMQ%E8%A7%92%E8%89%B2%E8%AF%A6%E8%A7%A3%E4%B9%8BProducer/"><i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" href="/cactus_blog/2020/01/09/RocketMQ%E7%9A%84%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E4%B8%8E%E7%9B%B8%E5%85%B3%E9%85%8D%E7%BD%AE/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E8%A7%92%E8%89%B2%E8%AF%A6%E8%A7%A3%E4%B9%8BConsumer/" target="_blank" rel="noopener"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E8%A7%92%E8%89%B2%E8%AF%A6%E8%A7%A3%E4%B9%8BConsumer/&text=RocketMQ角色详解之Consumer" target="_blank" rel="noopener"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E8%A7%92%E8%89%B2%E8%AF%A6%E8%A7%A3%E4%B9%8BConsumer/&title=RocketMQ角色详解之Consumer" target="_blank" rel="noopener"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E8%A7%92%E8%89%B2%E8%AF%A6%E8%A7%A3%E4%B9%8BConsumer/&is_video=false&description=RocketMQ角色详解之Consumer" target="_blank" rel="noopener"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=RocketMQ角色详解之Consumer&body=Check out this article: http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E8%A7%92%E8%89%B2%E8%AF%A6%E8%A7%A3%E4%B9%8BConsumer/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E8%A7%92%E8%89%B2%E8%AF%A6%E8%A7%A3%E4%B9%8BConsumer/&title=RocketMQ角色详解之Consumer" target="_blank" rel="noopener"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E8%A7%92%E8%89%B2%E8%AF%A6%E8%A7%A3%E4%B9%8BConsumer/&title=RocketMQ角色详解之Consumer" target="_blank" rel="noopener"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E8%A7%92%E8%89%B2%E8%AF%A6%E8%A7%A3%E4%B9%8BConsumer/&title=RocketMQ角色详解之Consumer" target="_blank" rel="noopener"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E8%A7%92%E8%89%B2%E8%AF%A6%E8%A7%A3%E4%B9%8BConsumer/&title=RocketMQ角色详解之Consumer" target="_blank" rel="noopener"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E8%A7%92%E8%89%B2%E8%AF%A6%E8%A7%A3%E4%B9%8BConsumer/&name=RocketMQ角色详解之Consumer&description=" target="_blank" rel="noopener"><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://news.ycombinator.com/submitlink?u=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E8%A7%92%E8%89%B2%E8%AF%A6%E8%A7%A3%E4%B9%8BConsumer/&t=RocketMQ角色详解之Consumer" target="_blank" rel="noopener"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#一、常用Consumer类"><span class="toc-number">1.</span> <span class="toc-text">一、常用Consumer类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#二、DefaultMQPushConsumer的使用"><span class="toc-number">2.</span> <span class="toc-text">二、DefaultMQPushConsumer的使用</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#主要参数的设置："><span class="toc-number">2.0.1.</span> <span class="toc-text">主要参数的设置：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#详细代码如下："><span class="toc-number">2.0.2.</span> <span class="toc-text">详细代码如下：</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#DefaultMQPullConsumer的使用"><span class="toc-number">3.</span> <span class="toc-text">DefaultMQPullConsumer的使用</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        RocketMQ角色详解之Consumer
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">瑞高的博客空间</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2020-01-09T12:32:48.000Z" itemprop="datePublished">2020-01-09</time>
+        
+      
+    </div>
+
+
+      
+
+      
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <h3 id="一、常用Consumer类"><a href="#一、常用Consumer类" class="headerlink" title="一、常用Consumer类"></a>一、常用Consumer类</h3><ul>
+<li>DefaultMQPushConsumer</li>
+<li>DefaultMQPullConsumer</li>
+</ul>
+<p><strong>二者的区别：</strong><br>DefaultMQPushConsumer：<br>系统控制读取操作，收到消息后自动调用传入的处理方法来处理，实时性高<br>DefaultMQPullConsumer：<br>读取操作中的大部分功能由使用者自主控制 ，灵活性更高。</p>
+<p>两种Consumer的选取要主要取决于用户的使用场景，适合的才是最好的。</p>
+<h3 id="二、DefaultMQPushConsumer的使用"><a href="#二、DefaultMQPushConsumer的使用" class="headerlink" title="二、DefaultMQPushConsumer的使用"></a>二、DefaultMQPushConsumer的使用</h3><h5 id="主要参数的设置："><a href="#主要参数的设置：" class="headerlink" title="主要参数的设置："></a>主要参数的设置：</h5><ul>
+<li>ConsumerGroupName</li>
+<li>NameServer地址及端口号</li>
+<li>Topic</li>
+</ul>
+<p><strong>ConsumerGroupName</strong></p>
+<p>通过设置ConsumerGroupName将多个 Consumer组织到一起对同一topic进行消费， 提高并发处理能力，且ConsumerGroupName需与消息模式 (MessageModel)配合使用</p>
+<p>MessageModel = Clustering时，<br>在 Clustering模式下，同一个 ConsumerGroup(GroupName相同) 里的每个Consumer 只消费所订阅消息的一部分内容， 同一个ConsumerGroup 里所有的 Consumer消费的内容合起来才是所订阅 Topic 内容的整体， 从而达到负载均衡的目的 。</p>
+<p>MessageModel = Broadcasting时，<br>同一个 ConsumerGroup里的每个 Consumer都 能消费到所订阅 Topic 的全部消息，也就是一个消息会被多次分发，被 多个 Consumer消费。</p>
+<p><strong>NameServer地址及端口号</strong><br>可以填写多个 ，用分号隔开，用以消除单点故障<br>如 “ip1:port;ip2:port;ip3 :port” </p>
+<p><strong>Topic</strong><br>Topic名称用来标识消息类型， 需要提前创建。<br>如果不需要消费某 个 Topic 下的所有消息，可以通过指定消息的 Tag 进行消息过滤，在填写 Tag 参数的位置，若赋值为 null 或 * 则表示要消费此Topic 的所有消息 。</p>
+<p><strong>参数设置完毕后将MessageListener注册到该consumer即可自动监听处理接收到的消息</strong></p>
+<h5 id="详细代码如下："><a href="#详细代码如下：" class="headerlink" title="详细代码如下："></a>详细代码如下：</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> org.apache.rocketmq.example.simple;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.List;</span><br><span class="line"><span class="keyword">import</span> org.apache.rocketmq.client.consumer.DefaultMQPushConsumer;</span><br><span class="line"><span class="keyword">import</span> org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyContext;</span><br><span class="line"><span class="keyword">import</span> org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyStatus;</span><br><span class="line"><span class="keyword">import</span> org.apache.rocketmq.client.consumer.listener.MessageListenerConcurrently;</span><br><span class="line"><span class="keyword">import</span> org.apache.rocketmq.client.exception.MQClientException;</span><br><span class="line"><span class="keyword">import</span> org.apache.rocketmq.common.consumer.ConsumeFromWhere;</span><br><span class="line"><span class="keyword">import</span> org.apache.rocketmq.common.message.MessageExt;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PushConsumer</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> InterruptedException, MQClientException </span>&#123;</span><br><span class="line">        DefaultMQPushConsumer consumer = <span class="keyword">new</span> DefaultMQPushConsumer(<span class="string">"CID_JODIE_1"</span>);</span><br><span class="line">        consumer.subscribe(<span class="string">"Jodie_topic_1023"</span>, <span class="string">"*"</span>);</span><br><span class="line">        consumer.setConsumeFromWhere(ConsumeFromWhere.CONSUME_FROM_FIRST_OFFSET);</span><br><span class="line">        consumer.setConsumeTimestamp(<span class="string">"20170422221800"</span>);</span><br><span class="line">        consumer.registerMessageListener(<span class="keyword">new</span> MessageListenerConcurrently() &#123;</span><br><span class="line"></span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> ConsumeConcurrentlyStatus <span class="title">consumeMessage</span><span class="params">(List&lt;MessageExt&gt; msgs, ConsumeConcurrentlyContext context)</span> </span>&#123;</span><br><span class="line">                System.out.printf(<span class="string">"%s Receive New Messages: %s %n"</span>, Thread.currentThread().getName(), msgs);</span><br><span class="line">                <span class="keyword">return</span> ConsumeConcurrentlyStatus.CONSUME_SUCCESS;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">        consumer.start();</span><br><span class="line">        System.out.printf(<span class="string">"Consumer Started.%n"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="DefaultMQPullConsumer的使用"><a href="#DefaultMQPullConsumer的使用" class="headerlink" title="DefaultMQPullConsumer的使用"></a>DefaultMQPullConsumer的使用</h3><p>DefaultMQPullConsumer对消息队列的主要处理流程如下：</p>
+<ol>
+<li>获取Message Queue并遍历</li>
+<li>维护Offsetstore</li>
+<li>根据不同消息状态做不同的处理</li>
+</ol>
+<p>具体代码参考如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> org.apache.rocketmq.example.simple;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.HashMap;</span><br><span class="line"><span class="keyword">import</span> java.util.Map;</span><br><span class="line"><span class="keyword">import</span> java.util.Set;</span><br><span class="line"><span class="keyword">import</span> org.apache.rocketmq.client.consumer.DefaultMQPullConsumer;</span><br><span class="line"><span class="keyword">import</span> org.apache.rocketmq.client.consumer.PullResult;</span><br><span class="line"><span class="keyword">import</span> org.apache.rocketmq.client.exception.MQClientException;</span><br><span class="line"><span class="keyword">import</span> org.apache.rocketmq.common.message.MessageQueue;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PullConsumer</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Map&lt;MessageQueue, Long&gt; OFFSE_TABLE = <span class="keyword">new</span> HashMap&lt;MessageQueue, Long&gt;();</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> MQClientException </span>&#123;</span><br><span class="line">        DefaultMQPullConsumer consumer = <span class="keyword">new</span> DefaultMQPullConsumer(<span class="string">"please_rename_unique_group_name_5"</span>);</span><br><span class="line"></span><br><span class="line">        consumer.start();</span><br><span class="line"></span><br><span class="line">        Set&lt;MessageQueue&gt; mqs = consumer.fetchSubscribeMessageQueues(<span class="string">"TopicTest1"</span>);</span><br><span class="line">        <span class="keyword">for</span> (MessageQueue mq : mqs) &#123;</span><br><span class="line">            System.out.printf(<span class="string">"Consume from the queue: %s%n"</span>, mq);</span><br><span class="line">            SINGLE_MQ:</span><br><span class="line">            <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    PullResult pullResult =</span><br><span class="line">                        consumer.pullBlockIfNotFound(mq, <span class="keyword">null</span>, getMessageQueueOffset(mq), <span class="number">32</span>);</span><br><span class="line">                    System.out.printf(<span class="string">"%s%n"</span>, pullResult);</span><br><span class="line">                    putMessageQueueOffset(mq, pullResult.getNextBeginOffset());</span><br><span class="line">                    <span class="keyword">switch</span> (pullResult.getPullStatus()) &#123;</span><br><span class="line">                        <span class="keyword">case</span> FOUND:</span><br><span class="line">                            <span class="keyword">break</span>;</span><br><span class="line">                        <span class="keyword">case</span> NO_MATCHED_MSG:</span><br><span class="line">                            <span class="keyword">break</span>;</span><br><span class="line">                        <span class="keyword">case</span> NO_NEW_MSG:</span><br><span class="line">                            <span class="keyword">break</span> SINGLE_MQ;</span><br><span class="line">                        <span class="keyword">case</span> OFFSET_ILLEGAL:</span><br><span class="line">                            <span class="keyword">break</span>;</span><br><span class="line">                        <span class="keyword">default</span>:</span><br><span class="line">                            <span class="keyword">break</span>;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">                    e.printStackTrace();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        consumer.shutdown();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">long</span> <span class="title">getMessageQueueOffset</span><span class="params">(MessageQueue mq)</span> </span>&#123;</span><br><span class="line">        Long offset = OFFSE_TABLE.get(mq);</span><br><span class="line">        <span class="keyword">if</span> (offset != <span class="keyword">null</span>)</span><br><span class="line">            <span class="keyword">return</span> offset;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">putMessageQueueOffset</span><span class="params">(MessageQueue mq, <span class="keyword">long</span> offset)</span> </span>&#123;</span><br><span class="line">        OFFSE_TABLE.put(mq, offset);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="http://www.liruigao.top/index.html">主页</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/article.html">创作</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/photos.html">摄影</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/blog.html">博客</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/about.html">关于我</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/contact.html">联系我</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#一、常用Consumer类"><span class="toc-number">1.</span> <span class="toc-text">一、常用Consumer类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#二、DefaultMQPushConsumer的使用"><span class="toc-number">2.</span> <span class="toc-text">二、DefaultMQPushConsumer的使用</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#主要参数的设置："><span class="toc-number">2.0.1.</span> <span class="toc-text">主要参数的设置：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#详细代码如下："><span class="toc-number">2.0.2.</span> <span class="toc-text">详细代码如下：</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#DefaultMQPullConsumer的使用"><span class="toc-number">3.</span> <span class="toc-text">DefaultMQPullConsumer的使用</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E8%A7%92%E8%89%B2%E8%AF%A6%E8%A7%A3%E4%B9%8BConsumer/" target="_blank" rel="noopener"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E8%A7%92%E8%89%B2%E8%AF%A6%E8%A7%A3%E4%B9%8BConsumer/&text=RocketMQ角色详解之Consumer" target="_blank" rel="noopener"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E8%A7%92%E8%89%B2%E8%AF%A6%E8%A7%A3%E4%B9%8BConsumer/&title=RocketMQ角色详解之Consumer" target="_blank" rel="noopener"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E8%A7%92%E8%89%B2%E8%AF%A6%E8%A7%A3%E4%B9%8BConsumer/&is_video=false&description=RocketMQ角色详解之Consumer" target="_blank" rel="noopener"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=RocketMQ角色详解之Consumer&body=Check out this article: http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E8%A7%92%E8%89%B2%E8%AF%A6%E8%A7%A3%E4%B9%8BConsumer/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E8%A7%92%E8%89%B2%E8%AF%A6%E8%A7%A3%E4%B9%8BConsumer/&title=RocketMQ角色详解之Consumer" target="_blank" rel="noopener"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E8%A7%92%E8%89%B2%E8%AF%A6%E8%A7%A3%E4%B9%8BConsumer/&title=RocketMQ角色详解之Consumer" target="_blank" rel="noopener"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E8%A7%92%E8%89%B2%E8%AF%A6%E8%A7%A3%E4%B9%8BConsumer/&title=RocketMQ角色详解之Consumer" target="_blank" rel="noopener"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E8%A7%92%E8%89%B2%E8%AF%A6%E8%A7%A3%E4%B9%8BConsumer/&title=RocketMQ角色详解之Consumer" target="_blank" rel="noopener"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E8%A7%92%E8%89%B2%E8%AF%A6%E8%A7%A3%E4%B9%8BConsumer/&name=RocketMQ角色详解之Consumer&description=" target="_blank" rel="noopener"><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://news.ycombinator.com/submitlink?u=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E8%A7%92%E8%89%B2%E8%AF%A6%E8%A7%A3%E4%B9%8BConsumer/&t=RocketMQ角色详解之Consumer" target="_blank" rel="noopener"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2020 liruigao.top
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="http://www.liruigao.top/index.html">主页</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/article.html">创作</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/photos.html">摄影</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/blog.html">博客</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/about.html">关于我</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/contact.html">联系我</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+<link rel="stylesheet" href="/cactus_blog/lib/font-awesome/css/all.min.css">
+
+
+<link rel="stylesheet" href="/cactus_blog/lib/justified-gallery/css/justifiedGallery.min.css">
+
+
+    <!-- jquery -->
+
+<script src="/cactus_blog/lib/jquery/jquery.min.js"></script>
+
+
+<script src="/cactus_blog/lib/justified-gallery/js/jquery.justifiedGallery.min.js"></script>
+
+<!-- clipboard -->
+
+  
+<script src="/cactus_blog/lib/clipboard/clipboard.min.js"></script>
+
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="far fa-clone"></i>';
+    btn += '</span>'; 
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/cactus_blog/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Google Analytics -->
+
+<!-- Baidu Analytics -->
+
+<!-- Disqus Comments -->
+
+
+</body>
+</html>

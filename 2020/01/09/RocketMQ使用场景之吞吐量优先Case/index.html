@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="一、Broker端进行消息过滤，提高吞吐量在 Broker端进行消息过滤，可以减少无效消息发送到 Consumer，少占用网络带宽从而提高吞吐量 。 过滤方式：方式1：通过tag 和 key 进行过滤(在创建Message时设置）Tag和 Key的主要差别是使用场景不同Tag用在 Consumer的代码中，用来进行服务端消息过滤Key 主要用于通过命令行查询消息 。 方式2：通过sql表达式的方式">
+<meta property="og:type" content="article">
+<meta property="og:title" content="RocketMQ使用场景之吞吐量优先Case">
+<meta property="og:url" content="http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF%E4%B9%8B%E5%90%9E%E5%90%90%E9%87%8F%E4%BC%98%E5%85%88Case/index.html">
+<meta property="og:site_name" content="瑞高的博客空间">
+<meta property="og:description" content="一、Broker端进行消息过滤，提高吞吐量在 Broker端进行消息过滤，可以减少无效消息发送到 Consumer，少占用网络带宽从而提高吞吐量 。 过滤方式：方式1：通过tag 和 key 进行过滤(在创建Message时设置）Tag和 Key的主要差别是使用场景不同Tag用在 Consumer的代码中，用来进行服务端消息过滤Key 主要用于通过命令行查询消息 。 方式2：通过sql表达式的方式">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2020-01-09T12:36:45.000Z">
+<meta property="article:modified_time" content="2020-01-09T12:42:43.651Z">
+<meta property="article:author" content="liruigao.top">
+<meta name="twitter:card" content="summary">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="/cactus_blog/images/favicon.ico">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="/cactus_blog/images/favicon-192x192.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="/cactus_blog/images/apple-touch-icon.png">
+          
+        
+    
+    <!-- title -->
+    <title>RocketMQ使用场景之吞吐量优先Case</title>
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/cactus_blog/css/style.css">
+
+    <!-- persian styles -->
+    
+      
+<link rel="stylesheet" href="/cactus_blog/css/rtl.css">
+
+    
+    <!-- rss -->
+    
+    
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="http://www.liruigao.top/index.html">主页</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/article.html">创作</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/photos.html">摄影</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/blog.html">博客</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/about.html">关于我</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/contact.html">联系我</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        
+        <li><a class="icon" href="/cactus_blog/2020/01/09/RocketMQ%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF%E4%B9%8B%E5%8F%AF%E9%9D%A0%E6%80%A7%E4%BC%98%E5%85%88Case/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF%E4%B9%8B%E5%90%9E%E5%90%90%E9%87%8F%E4%BC%98%E5%85%88Case/" target="_blank" rel="noopener"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF%E4%B9%8B%E5%90%9E%E5%90%90%E9%87%8F%E4%BC%98%E5%85%88Case/&text=RocketMQ使用场景之吞吐量优先Case" target="_blank" rel="noopener"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF%E4%B9%8B%E5%90%9E%E5%90%90%E9%87%8F%E4%BC%98%E5%85%88Case/&title=RocketMQ使用场景之吞吐量优先Case" target="_blank" rel="noopener"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF%E4%B9%8B%E5%90%9E%E5%90%90%E9%87%8F%E4%BC%98%E5%85%88Case/&is_video=false&description=RocketMQ使用场景之吞吐量优先Case" target="_blank" rel="noopener"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=RocketMQ使用场景之吞吐量优先Case&body=Check out this article: http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF%E4%B9%8B%E5%90%9E%E5%90%90%E9%87%8F%E4%BC%98%E5%85%88Case/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF%E4%B9%8B%E5%90%9E%E5%90%90%E9%87%8F%E4%BC%98%E5%85%88Case/&title=RocketMQ使用场景之吞吐量优先Case" target="_blank" rel="noopener"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF%E4%B9%8B%E5%90%9E%E5%90%90%E9%87%8F%E4%BC%98%E5%85%88Case/&title=RocketMQ使用场景之吞吐量优先Case" target="_blank" rel="noopener"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF%E4%B9%8B%E5%90%9E%E5%90%90%E9%87%8F%E4%BC%98%E5%85%88Case/&title=RocketMQ使用场景之吞吐量优先Case" target="_blank" rel="noopener"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF%E4%B9%8B%E5%90%9E%E5%90%90%E9%87%8F%E4%BC%98%E5%85%88Case/&title=RocketMQ使用场景之吞吐量优先Case" target="_blank" rel="noopener"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF%E4%B9%8B%E5%90%9E%E5%90%90%E9%87%8F%E4%BC%98%E5%85%88Case/&name=RocketMQ使用场景之吞吐量优先Case&description=" target="_blank" rel="noopener"><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://news.ycombinator.com/submitlink?u=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF%E4%B9%8B%E5%90%9E%E5%90%90%E9%87%8F%E4%BC%98%E5%85%88Case/&t=RocketMQ使用场景之吞吐量优先Case" target="_blank" rel="noopener"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#一、Broker端进行消息过滤，提高吞吐量"><span class="toc-number">1.</span> <span class="toc-text">一、Broker端进行消息过滤，提高吞吐量</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#过滤方式："><span class="toc-number">1.0.1.</span> <span class="toc-text">过滤方式：</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#二、提高Consumer处理能力"><span class="toc-number">2.</span> <span class="toc-text">二、提高Consumer处理能力</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#三、Consumer负载均衡"><span class="toc-number">3.</span> <span class="toc-text">三、Consumer负载均衡</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#四、提高Producer发送速度"><span class="toc-number">4.</span> <span class="toc-text">四、提高Producer发送速度</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        RocketMQ使用场景之吞吐量优先Case
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">瑞高的博客空间</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2020-01-09T12:36:45.000Z" itemprop="datePublished">2020-01-09</time>
+        
+      
+    </div>
+
+
+      
+
+      
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <h3 id="一、Broker端进行消息过滤，提高吞吐量"><a href="#一、Broker端进行消息过滤，提高吞吐量" class="headerlink" title="一、Broker端进行消息过滤，提高吞吐量"></a>一、Broker端进行消息过滤，提高吞吐量</h3><p><strong>在 Broker端进行消息过滤，可以减少无效消息发送到 Consumer，少占用网络带宽从而提高吞吐量 。</strong></p>
+<h5 id="过滤方式："><a href="#过滤方式：" class="headerlink" title="过滤方式："></a>过滤方式：</h5><p><strong>方式1：</strong><br>通过tag 和 key 进行过滤(在创建Message时设置）<br>Tag和 Key的主要差别是使用场景不同<br>Tag用在 Consumer的代码中，用来进行服务端消息过滤<br>Key 主要用于通过命令行查询消息 。</p>
+<p><strong>方式2：</strong><br>通过sql表达式的方式进行过滤</p>
+<p>SqlProducer.java</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> org.apache.rocketmq.example.filter;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.apache.rocketmq.client.exception.MQClientException;</span><br><span class="line"><span class="keyword">import</span> org.apache.rocketmq.client.producer.DefaultMQProducer;</span><br><span class="line"><span class="keyword">import</span> org.apache.rocketmq.client.producer.SendResult;</span><br><span class="line"><span class="keyword">import</span> org.apache.rocketmq.common.message.Message;</span><br><span class="line"><span class="keyword">import</span> org.apache.rocketmq.remoting.common.RemotingHelper;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SqlProducer</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        DefaultMQProducer producer = <span class="keyword">new</span> DefaultMQProducer(<span class="string">"please_rename_unique_group_name"</span>);</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            producer.start();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (MQClientException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10</span>; i++) &#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                String tag;</span><br><span class="line">                <span class="keyword">int</span> div = i % <span class="number">3</span>;</span><br><span class="line">                <span class="keyword">if</span> (div == <span class="number">0</span>) &#123;</span><br><span class="line">                    tag = <span class="string">"TagA"</span>;</span><br><span class="line">                &#125; <span class="keyword">else</span> <span class="keyword">if</span> (div == <span class="number">1</span>) &#123;</span><br><span class="line">                    tag = <span class="string">"TagB"</span>;</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    tag = <span class="string">"TagC"</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                Message msg = <span class="keyword">new</span> Message(<span class="string">"TopicTest"</span>,</span><br><span class="line">                    tag,</span><br><span class="line">                    (<span class="string">"Hello RocketMQ "</span> + i).getBytes(RemotingHelper.DEFAULT_CHARSET)</span><br><span class="line">                );</span><br><span class="line">                msg.putUserProperty(<span class="string">"a"</span>, String.valueOf(i));</span><br><span class="line"></span><br><span class="line">                SendResult sendResult = producer.send(msg);</span><br><span class="line">                System.out.printf(<span class="string">"%s%n"</span>, sendResult);</span><br><span class="line">            &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    Thread.sleep(<span class="number">1000</span>);</span><br><span class="line">                &#125; <span class="keyword">catch</span> (InterruptedException e1) &#123;</span><br><span class="line">                    e1.printStackTrace();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        producer.shutdown();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>SqlConsumer.java</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> org.apache.rocketmq.example.filter;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.apache.rocketmq.client.consumer.DefaultMQPushConsumer;</span><br><span class="line"><span class="keyword">import</span> org.apache.rocketmq.client.consumer.MessageSelector;</span><br><span class="line"><span class="keyword">import</span> org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyContext;</span><br><span class="line"><span class="keyword">import</span> org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyStatus;</span><br><span class="line"><span class="keyword">import</span> org.apache.rocketmq.client.consumer.listener.MessageListenerConcurrently;</span><br><span class="line"><span class="keyword">import</span> org.apache.rocketmq.client.exception.MQClientException;</span><br><span class="line"><span class="keyword">import</span> org.apache.rocketmq.common.message.MessageExt;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.List;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SqlConsumer</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        DefaultMQPushConsumer consumer = <span class="keyword">new</span> DefaultMQPushConsumer(<span class="string">"please_rename_unique_group_name_4"</span>);</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            consumer.subscribe(<span class="string">"TopicTest"</span>,</span><br><span class="line">                MessageSelector.bySql(<span class="string">"(TAGS is not null and TAGS in ('TagA', 'TagB'))"</span> +</span><br><span class="line">                    <span class="string">"and (a is not null and a between 0  3)"</span>));</span><br><span class="line">        &#125; <span class="keyword">catch</span> (MQClientException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        consumer.registerMessageListener(<span class="keyword">new</span> MessageListenerConcurrently() &#123;</span><br><span class="line"></span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> ConsumeConcurrentlyStatus <span class="title">consumeMessage</span><span class="params">(List&lt;MessageExt&gt; msgs,</span></span></span><br><span class="line"><span class="function"><span class="params">                ConsumeConcurrentlyContext context)</span> </span>&#123;</span><br><span class="line">                System.out.printf(<span class="string">"%s Receive New Messages: %s %n"</span>, Thread.currentThread().getName(), msgs);</span><br><span class="line">                <span class="keyword">return</span> ConsumeConcurrentlyStatus.CONSUME_SUCCESS;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            consumer.start();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (MQClientException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.printf(<span class="string">"Consumer Started.%n"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>方式3：</strong><br>Filter Server方式过滤</p>
+<p>producer.java</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> org.apache.rocketmq.example.filter;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.apache.rocketmq.client.exception.MQClientException;</span><br><span class="line"><span class="keyword">import</span> org.apache.rocketmq.client.producer.DefaultMQProducer;</span><br><span class="line"><span class="keyword">import</span> org.apache.rocketmq.client.producer.SendResult;</span><br><span class="line"><span class="keyword">import</span> org.apache.rocketmq.common.message.Message;</span><br><span class="line"><span class="keyword">import</span> org.apache.rocketmq.remoting.common.RemotingHelper;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Producer</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> MQClientException, InterruptedException </span>&#123;</span><br><span class="line">        DefaultMQProducer producer = <span class="keyword">new</span> DefaultMQProducer(<span class="string">"ProducerGroupName"</span>);</span><br><span class="line">        producer.start();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">6000000</span>; i++) &#123;</span><br><span class="line">                Message msg = <span class="keyword">new</span> Message(<span class="string">"TopicFilter7"</span>,</span><br><span class="line">                    <span class="string">"TagA"</span>,</span><br><span class="line">                    <span class="string">"OrderID001"</span>,</span><br><span class="line">                    <span class="string">"Hello world"</span>.getBytes(RemotingHelper.DEFAULT_CHARSET));</span><br><span class="line"></span><br><span class="line">                msg.putUserProperty(<span class="string">"SequenceId"</span>, String.valueOf(i));</span><br><span class="line">                SendResult sendResult = producer.send(msg);</span><br><span class="line">                System.out.printf(<span class="string">"%s%n"</span>, sendResult);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        producer.shutdown();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>consumer.java</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> org.apache.rocketmq.example.filter;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.File;</span><br><span class="line"><span class="keyword">import</span> java.io.IOException;</span><br><span class="line"><span class="keyword">import</span> java.util.List;</span><br><span class="line"><span class="keyword">import</span> org.apache.rocketmq.client.consumer.DefaultMQPushConsumer;</span><br><span class="line"><span class="keyword">import</span> org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyContext;</span><br><span class="line"><span class="keyword">import</span> org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyStatus;</span><br><span class="line"><span class="keyword">import</span> org.apache.rocketmq.client.consumer.listener.MessageListenerConcurrently;</span><br><span class="line"><span class="keyword">import</span> org.apache.rocketmq.client.exception.MQClientException;</span><br><span class="line"><span class="keyword">import</span> org.apache.rocketmq.common.MixAll;</span><br><span class="line"><span class="keyword">import</span> org.apache.rocketmq.common.message.MessageExt;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Consumer</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> InterruptedException, MQClientException, IOException </span>&#123;</span><br><span class="line">        DefaultMQPushConsumer consumer = <span class="keyword">new</span> DefaultMQPushConsumer(<span class="string">"ConsumerGroupNamecc4"</span>);</span><br><span class="line"></span><br><span class="line">        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();</span><br><span class="line">        File classFile = <span class="keyword">new</span> File(classLoader.getResource(<span class="string">"MessageFilterImpl.java"</span>).getFile());</span><br><span class="line"></span><br><span class="line">        String filterCode = MixAll.file2String(classFile);</span><br><span class="line">        consumer.subscribe(<span class="string">"TopicTest"</span>, <span class="string">"org.apache.rocketmq.example.filter.MessageFilterImpl"</span>,</span><br><span class="line">            filterCode);</span><br><span class="line"></span><br><span class="line">        consumer.registerMessageListener(<span class="keyword">new</span> MessageListenerConcurrently() &#123;</span><br><span class="line"></span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> ConsumeConcurrentlyStatus <span class="title">consumeMessage</span><span class="params">(List&lt;MessageExt&gt; msgs,</span></span></span><br><span class="line"><span class="function"><span class="params">                ConsumeConcurrentlyContext context)</span> </span>&#123;</span><br><span class="line">                System.out.printf(<span class="string">"%s Receive New Messages: %s %n"</span>, Thread.currentThread().getName(), msgs);</span><br><span class="line">                <span class="keyword">return</span> ConsumeConcurrentlyStatus.CONSUME_SUCCESS;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line"></span><br><span class="line">        consumer.start();</span><br><span class="line"></span><br><span class="line">        System.out.printf(<span class="string">"Consumer Started.%n"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="二、提高Consumer处理能力"><a href="#二、提高Consumer处理能力" class="headerlink" title="二、提高Consumer处理能力"></a>二、提高Consumer处理能力</h3><p><strong>1.提高消费并行度</strong><br>方式1：增加consumer实例<br>方式2：提高单个 Consumer 实例中的并行处理的线程数<br>（修改 consumeThreadMin 和 consumeThreadMax)</p>
+<p><strong>2.批量方式进行消费</strong><br>设置 Consumer 的 consumeMessageBatchMaxSize<br>这个参数 ，默认是 1，如果设置为 N，在消息多的时候每次收到的是个长度为 N的消息链表</p>
+<p><strong>注意：</strong><br>broker配置文件的maxTransferCountOnMessageInMemory参数也要相应增加<br>该参数指的是服务器但允许在内存中传递的最大消息数，默认是32条</p>
+<p><strong>3.检测延时情况，跳过非重要消息</strong><br>Consumer 在消费的过程中， 如果发现由于某种原因发生严重的消息堆积，短时间无法消除堆积<br>这个时候可以选择丢弃不重要 的消息，使 Consumer尽快追上 Producer 的进度</p>
+<h3 id="三、Consumer负载均衡"><a href="#三、Consumer负载均衡" class="headerlink" title="三、Consumer负载均衡"></a>三、Consumer负载均衡</h3><p><strong>DefaultMQPushConsumer的负载均衡：</strong><br>负载均衡过程不需要使用者操心，客户端程序会自动处理<br>每启动一个consumer就会触发一次doRebalance,ConsumerGroup加入新consuemr时，也会触发doRebalace</p>
+<p><strong>注意：</strong><br>负载均衡算法默认使用AllocateMessageQueueAveragely。(分配粒度只到 Message Queue)<br>负载均衡的结果与 Topic 的 Message Queue 数量，以及 ConsumerGroup 里的 Consumer 的数量有关 。<br>3m2c: 2 1<br>3m4c: 1 1 1 0<br>可见Message Queue数量设置过小不利于做负载均衡,通常情况下，应把一个 Topic 的Message Queue 数设置为 16。</p>
+<p><strong>DefaultMQPullConsumer 的负载均衡：</strong><br><strong>1.通过registerMessageQueueListener 函数</strong><br>registerMessageQueueListener函数在有新的Consumer加入或退出时被触发。 </p>
+<p><strong>2.通过MQPullConsumerScheduleService类</strong><br>具体参考代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> org.apache.rocketmq.example.simple;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.apache.rocketmq.client.consumer.MQPullConsumer;</span><br><span class="line"><span class="keyword">import</span> org.apache.rocketmq.client.consumer.MQPullConsumerScheduleService;</span><br><span class="line"><span class="keyword">import</span> org.apache.rocketmq.client.consumer.PullResult;</span><br><span class="line"><span class="keyword">import</span> org.apache.rocketmq.client.consumer.PullTaskCallback;</span><br><span class="line"><span class="keyword">import</span> org.apache.rocketmq.client.consumer.PullTaskContext;</span><br><span class="line"><span class="keyword">import</span> org.apache.rocketmq.client.exception.MQClientException;</span><br><span class="line"><span class="keyword">import</span> org.apache.rocketmq.common.message.MessageQueue;</span><br><span class="line"><span class="keyword">import</span> org.apache.rocketmq.common.protocol.heartbeat.MessageModel;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PullScheduleService</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> MQClientException </span>&#123;</span><br><span class="line">        <span class="keyword">final</span> MQPullConsumerScheduleService scheduleService = <span class="keyword">new</span> MQPullConsumerScheduleService(<span class="string">"GroupName1"</span>);</span><br><span class="line"></span><br><span class="line">        scheduleService.setMessageModel(MessageModel.CLUSTERING);</span><br><span class="line">        scheduleService.registerPullTaskCallback(<span class="string">"TopicTest"</span>, <span class="keyword">new</span> PullTaskCallback() &#123;</span><br><span class="line"></span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doPullTask</span><span class="params">(MessageQueue mq, PullTaskContext context)</span> </span>&#123;</span><br><span class="line">                MQPullConsumer consumer = context.getPullConsumer();</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line"></span><br><span class="line">                    <span class="keyword">long</span> offset = consumer.fetchConsumeOffset(mq, <span class="keyword">false</span>);</span><br><span class="line">                    <span class="keyword">if</span> (offset &lt; <span class="number">0</span>)</span><br><span class="line">                        offset = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">                    PullResult pullResult = consumer.pull(mq, <span class="string">"*"</span>, offset, <span class="number">32</span>);</span><br><span class="line">                    System.out.printf(<span class="string">"%s%n"</span>, offset + <span class="string">"\t"</span> + mq + <span class="string">"\t"</span> + pullResult);</span><br><span class="line">                    <span class="keyword">switch</span> (pullResult.getPullStatus()) &#123;</span><br><span class="line">                        <span class="keyword">case</span> FOUND:</span><br><span class="line">                            <span class="keyword">break</span>;</span><br><span class="line">                        <span class="keyword">case</span> NO_MATCHED_MSG:</span><br><span class="line">                            <span class="keyword">break</span>;</span><br><span class="line">                        <span class="keyword">case</span> NO_NEW_MSG:</span><br><span class="line">                        <span class="keyword">case</span> OFFSET_ILLEGAL:</span><br><span class="line">                            <span class="keyword">break</span>;</span><br><span class="line">                        <span class="keyword">default</span>:</span><br><span class="line">                            <span class="keyword">break</span>;</span><br><span class="line">                    &#125;</span><br><span class="line">                    consumer.updateConsumeOffset(mq, pullResult.getNextBeginOffset());</span><br><span class="line"></span><br><span class="line">                    context.setPullNextDelayTimeMillis(<span class="number">100</span>);</span><br><span class="line">                &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">                    e.printStackTrace();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line"></span><br><span class="line">        scheduleService.start();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="四、提高Producer发送速度"><a href="#四、提高Producer发送速度" class="headerlink" title="四、提高Producer发送速度"></a>四、提高Producer发送速度</h3><p><strong>途径1：</strong><br>增加Producer并发量，使用多个Producer实例同时发送</p>
+<p><strong>注意：</strong><br>不用担心多 Producer 同时写会降低消息写磁盘的效率， RocketMQ 引入了 一个并发窗口，在窗口内消息可以并发地写人 DirectMem 中 ， 然后异步地将连续一段无空洞的数据刷入文件系统当中 。</p>
+<p><strong>途径2：</strong><br>可靠性要求不高的场景下，可以采用OneWay方式发送。<br>单向（Oneway）发送特点为发送方只负责发送消息，不等待服务器回应且没有回调函数触发，<br>即只发送请求不等待应答。 此方式发送消息的过程耗时非常短，一般在微秒级别。</p>
+<p>具体参考代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">OnewayProducer</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception</span>&#123;</span><br><span class="line">        <span class="comment">//Instantiate with a producer group name.</span></span><br><span class="line">        DefaultMQProducer producer = <span class="keyword">new</span> DefaultMQProducer(<span class="string">"example_group_name"</span>);</span><br><span class="line">        <span class="comment">//Launch the instance.</span></span><br><span class="line">        producer.start();</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">100</span>; i++) &#123;</span><br><span class="line">            <span class="comment">//Create a message instance, specifying topic, tag and message body.</span></span><br><span class="line">            Message msg = <span class="keyword">new</span> Message(<span class="string">"TopicTest"</span> <span class="comment">/* Topic */</span>,</span><br><span class="line">                    <span class="string">"TagA"</span> <span class="comment">/* Tag */</span>,</span><br><span class="line">                    (<span class="string">"Hello RocketMQ "</span> +</span><br><span class="line">                            i).getBytes(RemotingHelper.DEFAULT_CHARSET) <span class="comment">/* Message body */</span></span><br><span class="line">            );</span><br><span class="line">            <span class="comment">//Call send message to deliver message to one of brokers.</span></span><br><span class="line">            producer.sendOneway(msg);</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//Shut down once the producer instance is not longer in use.</span></span><br><span class="line">        producer.shutdown();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="http://www.liruigao.top/index.html">主页</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/article.html">创作</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/photos.html">摄影</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/blog.html">博客</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/about.html">关于我</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/contact.html">联系我</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#一、Broker端进行消息过滤，提高吞吐量"><span class="toc-number">1.</span> <span class="toc-text">一、Broker端进行消息过滤，提高吞吐量</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#过滤方式："><span class="toc-number">1.0.1.</span> <span class="toc-text">过滤方式：</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#二、提高Consumer处理能力"><span class="toc-number">2.</span> <span class="toc-text">二、提高Consumer处理能力</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#三、Consumer负载均衡"><span class="toc-number">3.</span> <span class="toc-text">三、Consumer负载均衡</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#四、提高Producer发送速度"><span class="toc-number">4.</span> <span class="toc-text">四、提高Producer发送速度</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF%E4%B9%8B%E5%90%9E%E5%90%90%E9%87%8F%E4%BC%98%E5%85%88Case/" target="_blank" rel="noopener"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF%E4%B9%8B%E5%90%9E%E5%90%90%E9%87%8F%E4%BC%98%E5%85%88Case/&text=RocketMQ使用场景之吞吐量优先Case" target="_blank" rel="noopener"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF%E4%B9%8B%E5%90%9E%E5%90%90%E9%87%8F%E4%BC%98%E5%85%88Case/&title=RocketMQ使用场景之吞吐量优先Case" target="_blank" rel="noopener"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF%E4%B9%8B%E5%90%9E%E5%90%90%E9%87%8F%E4%BC%98%E5%85%88Case/&is_video=false&description=RocketMQ使用场景之吞吐量优先Case" target="_blank" rel="noopener"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=RocketMQ使用场景之吞吐量优先Case&body=Check out this article: http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF%E4%B9%8B%E5%90%9E%E5%90%90%E9%87%8F%E4%BC%98%E5%85%88Case/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF%E4%B9%8B%E5%90%9E%E5%90%90%E9%87%8F%E4%BC%98%E5%85%88Case/&title=RocketMQ使用场景之吞吐量优先Case" target="_blank" rel="noopener"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF%E4%B9%8B%E5%90%9E%E5%90%90%E9%87%8F%E4%BC%98%E5%85%88Case/&title=RocketMQ使用场景之吞吐量优先Case" target="_blank" rel="noopener"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF%E4%B9%8B%E5%90%9E%E5%90%90%E9%87%8F%E4%BC%98%E5%85%88Case/&title=RocketMQ使用场景之吞吐量优先Case" target="_blank" rel="noopener"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF%E4%B9%8B%E5%90%9E%E5%90%90%E9%87%8F%E4%BC%98%E5%85%88Case/&title=RocketMQ使用场景之吞吐量优先Case" target="_blank" rel="noopener"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF%E4%B9%8B%E5%90%9E%E5%90%90%E9%87%8F%E4%BC%98%E5%85%88Case/&name=RocketMQ使用场景之吞吐量优先Case&description=" target="_blank" rel="noopener"><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://news.ycombinator.com/submitlink?u=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF%E4%B9%8B%E5%90%9E%E5%90%90%E9%87%8F%E4%BC%98%E5%85%88Case/&t=RocketMQ使用场景之吞吐量优先Case" target="_blank" rel="noopener"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2020 liruigao.top
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="http://www.liruigao.top/index.html">主页</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/article.html">创作</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/photos.html">摄影</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/blog.html">博客</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/about.html">关于我</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/contact.html">联系我</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+<link rel="stylesheet" href="/cactus_blog/lib/font-awesome/css/all.min.css">
+
+
+<link rel="stylesheet" href="/cactus_blog/lib/justified-gallery/css/justifiedGallery.min.css">
+
+
+    <!-- jquery -->
+
+<script src="/cactus_blog/lib/jquery/jquery.min.js"></script>
+
+
+<script src="/cactus_blog/lib/justified-gallery/js/jquery.justifiedGallery.min.js"></script>
+
+<!-- clipboard -->
+
+  
+<script src="/cactus_blog/lib/clipboard/clipboard.min.js"></script>
+
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="far fa-clone"></i>';
+    btn += '</span>'; 
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/cactus_blog/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Google Analytics -->
+
+<!-- Baidu Analytics -->
+
+<!-- Disqus Comments -->
+
+
+</body>
+</html>

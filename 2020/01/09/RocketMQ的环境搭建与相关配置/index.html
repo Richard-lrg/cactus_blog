@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="一、RocketMQ的下载http:&#x2F;&#x2F;rocketmq.apache.org&#x2F;dowloading&#x2F;releases&#x2F; 二、RocketMQ环境搭建搭建一个单机版的RocketMQ没有太大的实用价值，所以在这里搭建一个双主 、 双从 、 无单点故障的高可用 RocketMQ集群 。 材料准备两台物理机（这里我采用了两台虚拟机）主机地址：192.168.223.41 node01192.168.2">
+<meta property="og:type" content="article">
+<meta property="og:title" content="RocketMQ的环境搭建与相关配置">
+<meta property="og:url" content="http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E7%9A%84%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E4%B8%8E%E7%9B%B8%E5%85%B3%E9%85%8D%E7%BD%AE/index.html">
+<meta property="og:site_name" content="瑞高的博客空间">
+<meta property="og:description" content="一、RocketMQ的下载http:&#x2F;&#x2F;rocketmq.apache.org&#x2F;dowloading&#x2F;releases&#x2F; 二、RocketMQ环境搭建搭建一个单机版的RocketMQ没有太大的实用价值，所以在这里搭建一个双主 、 双从 、 无单点故障的高可用 RocketMQ集群 。 材料准备两台物理机（这里我采用了两台虚拟机）主机地址：192.168.223.41 node01192.168.2">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20190130155920435.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0NhY3R1c19Mcmc=,size_16,color_FFFFFF,t_70">
+<meta property="article:published_time" content="2020-01-09T12:31:25.000Z">
+<meta property="article:modified_time" content="2020-01-09T12:42:43.651Z">
+<meta property="article:author" content="liruigao.top">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/20190130155920435.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0NhY3R1c19Mcmc=,size_16,color_FFFFFF,t_70">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="/cactus_blog/images/favicon.ico">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="/cactus_blog/images/favicon-192x192.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="/cactus_blog/images/apple-touch-icon.png">
+          
+        
+    
+    <!-- title -->
+    <title>RocketMQ的环境搭建与相关配置</title>
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/cactus_blog/css/style.css">
+
+    <!-- persian styles -->
+    
+      
+<link rel="stylesheet" href="/cactus_blog/css/rtl.css">
+
+    
+    <!-- rss -->
+    
+    
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="http://www.liruigao.top/index.html">主页</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/article.html">创作</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/photos.html">摄影</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/blog.html">博客</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/about.html">关于我</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/contact.html">联系我</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" href="/cactus_blog/2020/01/09/RocketMQ%E8%A7%92%E8%89%B2%E8%AF%A6%E8%A7%A3%E4%B9%8BConsumer/"><i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" href="/cactus_blog/2020/01/09/RocketMQ%E6%A6%82%E8%BF%B0/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E7%9A%84%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E4%B8%8E%E7%9B%B8%E5%85%B3%E9%85%8D%E7%BD%AE/" target="_blank" rel="noopener"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E7%9A%84%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E4%B8%8E%E7%9B%B8%E5%85%B3%E9%85%8D%E7%BD%AE/&text=RocketMQ的环境搭建与相关配置" target="_blank" rel="noopener"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E7%9A%84%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E4%B8%8E%E7%9B%B8%E5%85%B3%E9%85%8D%E7%BD%AE/&title=RocketMQ的环境搭建与相关配置" target="_blank" rel="noopener"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E7%9A%84%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E4%B8%8E%E7%9B%B8%E5%85%B3%E9%85%8D%E7%BD%AE/&is_video=false&description=RocketMQ的环境搭建与相关配置" target="_blank" rel="noopener"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=RocketMQ的环境搭建与相关配置&body=Check out this article: http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E7%9A%84%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E4%B8%8E%E7%9B%B8%E5%85%B3%E9%85%8D%E7%BD%AE/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E7%9A%84%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E4%B8%8E%E7%9B%B8%E5%85%B3%E9%85%8D%E7%BD%AE/&title=RocketMQ的环境搭建与相关配置" target="_blank" rel="noopener"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E7%9A%84%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E4%B8%8E%E7%9B%B8%E5%85%B3%E9%85%8D%E7%BD%AE/&title=RocketMQ的环境搭建与相关配置" target="_blank" rel="noopener"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E7%9A%84%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E4%B8%8E%E7%9B%B8%E5%85%B3%E9%85%8D%E7%BD%AE/&title=RocketMQ的环境搭建与相关配置" target="_blank" rel="noopener"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E7%9A%84%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E4%B8%8E%E7%9B%B8%E5%85%B3%E9%85%8D%E7%BD%AE/&title=RocketMQ的环境搭建与相关配置" target="_blank" rel="noopener"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E7%9A%84%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E4%B8%8E%E7%9B%B8%E5%85%B3%E9%85%8D%E7%BD%AE/&name=RocketMQ的环境搭建与相关配置&description=" target="_blank" rel="noopener"><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://news.ycombinator.com/submitlink?u=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E7%9A%84%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E4%B8%8E%E7%9B%B8%E5%85%B3%E9%85%8D%E7%BD%AE/&t=RocketMQ的环境搭建与相关配置" target="_blank" rel="noopener"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#一、RocketMQ的下载"><span class="toc-number">1.</span> <span class="toc-text">一、RocketMQ的下载</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#二、RocketMQ环境搭建"><span class="toc-number">2.</span> <span class="toc-text">二、RocketMQ环境搭建</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#材料准备"><span class="toc-number">2.0.1.</span> <span class="toc-text">材料准备</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#配置步骤"><span class="toc-number">2.0.2.</span> <span class="toc-text">配置步骤</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#三、相关配置参数介绍"><span class="toc-number">3.</span> <span class="toc-text">三、相关配置参数介绍</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#四、配置过程踩过的一些坑"><span class="toc-number">4.</span> <span class="toc-text">四、配置过程踩过的一些坑</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        RocketMQ的环境搭建与相关配置
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">瑞高的博客空间</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2020-01-09T12:31:25.000Z" itemprop="datePublished">2020-01-09</time>
+        
+      
+    </div>
+
+
+      
+
+      
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <h2 id="一、RocketMQ的下载"><a href="#一、RocketMQ的下载" class="headerlink" title="一、RocketMQ的下载"></a>一、RocketMQ的下载</h2><p><a href="http://rocketmq.apache.org/dowloading/releases/" target="_blank" rel="noopener">http://rocketmq.apache.org/dowloading/releases/</a></p>
+<h2 id="二、RocketMQ环境搭建"><a href="#二、RocketMQ环境搭建" class="headerlink" title="二、RocketMQ环境搭建"></a>二、RocketMQ环境搭建</h2><p>搭建一个单机版的RocketMQ没有太大的实用价值，所以在这里<strong>搭建一个双主 、 双从 、 无单点故障</strong>的高可用 RocketMQ集群 。</p>
+<h4 id="材料准备"><a href="#材料准备" class="headerlink" title="材料准备"></a>材料准备</h4><p>两台物理机（这里我采用了两台虚拟机）<br>主机地址：<br>192.168.223.41 node01<br>192.168.223.42 node02</p>
+<h4 id="配置步骤"><a href="#配置步骤" class="headerlink" title="配置步骤"></a>配置步骤</h4><p><strong>1.解压文件</strong><br>unzip rocketmq-all-4.3.2-bin-release.zip -d ./rocketmq-all-4.3.2-bin</p>
+<p><strong>2.启动两机器的nameserver</strong><br>[root@node01 rocketmq-all-4.3.2-bin-release]# nohup sh bin/mqnamesrv &amp;<br>[root@node02 rocketmq-all-4.3.2-bin-release]# nohup sh bin/mqnamesrv &amp;</p>
+<p><strong>3.broker配置文件</strong></p>
+<p><strong>双master配置：</strong></p>
+<p>[root@node01]#vim /rocketmq-all-4.3.2-bin-release/conf/2m-2s-sync/broker-a.properties</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">namesrvAddr=<span class="number">192.168</span><span class="number">.223</span><span class="number">.41</span>:<span class="number">9876</span>;<span class="number">192.168</span><span class="number">.223</span><span class="number">.42</span>:<span class="number">9876</span></span><br><span class="line">brokerClusterName=DefaultCluster</span><br><span class="line">brokerName=broker-a</span><br><span class="line">brokerId=<span class="number">0</span></span><br><span class="line">deleteWhen=<span class="number">04</span></span><br><span class="line">fileReservedTime=<span class="number">48</span></span><br><span class="line">brokerRole=SYNC_MASTER</span><br><span class="line">flushDiskType=ASYNC_FLUSH</span><br><span class="line">listenPort=<span class="number">10911</span></span><br><span class="line">storePathRootDir=/home/rocketmq/store-a</span><br></pre></td></tr></table></figure>
+
+<p>[root@node02]#vim /rocketmq-all-4.3.2-bin-release/conf/2m-2s-sync/broker-b.properties</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">namesrvAddr=<span class="number">192.168</span><span class="number">.223</span><span class="number">.41</span>:<span class="number">9876</span>;<span class="number">192.168</span><span class="number">.223</span><span class="number">.42</span>:<span class="number">9876</span></span><br><span class="line">brokerClusterName=DefaultCluster</span><br><span class="line">brokerName=broker-b</span><br><span class="line">brokerId=<span class="number">0</span></span><br><span class="line">deleteWhen=<span class="number">04</span></span><br><span class="line">fileReservedTime=<span class="number">48</span></span><br><span class="line">brokerRole=SYNC_MASTER</span><br><span class="line">flushDiskType=ASYNC_FLUSH</span><br><span class="line">listenPort=<span class="number">10911</span></span><br><span class="line">storePathRootDir=/home/rocketmq/store-b</span><br></pre></td></tr></table></figure>
+
+<p><strong>双slave配置：</strong><br>[root@node01]#vim /rocketmq-all-4.3.2-bin-release/conf/2m-2s-sync/broker-b-s.properties</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">namesrvAddr=<span class="number">192.168</span><span class="number">.223</span><span class="number">.41</span>:<span class="number">9876</span>;<span class="number">192.168</span><span class="number">.223</span><span class="number">.42</span>:<span class="number">9876</span></span><br><span class="line">brokerClusterName=DefaultCluster</span><br><span class="line">brokerName=broker-b</span><br><span class="line">brokerId=<span class="number">1</span></span><br><span class="line">deleteWhen=<span class="number">04</span></span><br><span class="line">fileReservedTime=<span class="number">48</span></span><br><span class="line">brokerRole=SYNC_MASTER</span><br><span class="line">flushDiskType=ASYNC_FLUSH</span><br><span class="line">listenPort=<span class="number">10911</span></span><br><span class="line">storePathRootDir=/home/rocketmq/store-b</span><br></pre></td></tr></table></figure>
+<p>[root@node02]#vim /rocketmq-all-4.3.2-bin-release/conf/2m-2s-sync/broker-a-s.properties</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">namesrvAddr=<span class="number">192.168</span><span class="number">.223</span><span class="number">.41</span>:<span class="number">9876</span>;<span class="number">192.168</span><span class="number">.223</span><span class="number">.42</span>:<span class="number">9876</span></span><br><span class="line">brokerClusterName=DefaultCluster</span><br><span class="line">brokerName=broker-a</span><br><span class="line">brokerId=<span class="number">1</span></span><br><span class="line">deleteWhen=<span class="number">04</span></span><br><span class="line">fileReservedTime=<span class="number">48</span></span><br><span class="line">brokerRole=SLAVE</span><br><span class="line">flushDiskType=ASYNC_FLUSH</span><br><span class="line">listenPort=<span class="number">11011</span></span><br><span class="line">storePathRootDir=/home/rocketmq/store-a</span><br></pre></td></tr></table></figure>
+<p><strong>4.启动4个broker：</strong><br>命令：nohup sh ./bin/mqbroker –c config_file &amp;</p>
+<p>[root@node01 rocketmq-all-4.3.2-bin-release]# nohup sh ./bin/mqbroker -c ./conf/2m-2s-sync/broker-a.properties &amp;<br>[root@node01 rocketmq-all-4.3.2-bin-release]# nohup sh ./bin/mqbroker -c ./conf/2m-2s-sync/broker-b-s.properties &amp;<br>[root@node02 rocketmq-all-4.3.2-bin-release]# nohup sh ./bin/mqbroker -c ./conf/2m-2s-sync/broker-b.properties &amp;<br>[root@node02 rocketmq-all-4.3.2-bin-release]# nohup sh ./bin/mqbroker -c ./conf/2m-2s-sync/broker-a-s.properties &amp;</p>
+<p>jps查看效果如下：<br><img src="https://img-blog.csdnimg.cn/20190130155920435.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0NhY3R1c19Mcmc=,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br><strong>5.查看集群状态</strong><br>可采用图形化界面管理<br><a href="https://github.com/apache/rocketmq-externals/tree/master/rocketmq-console" target="_blank" rel="noopener">https://github.com/apache/rocketmq-externals/tree/master/rocketmq-console</a><br>图形化界面配置过程参考：<br><a href="https://yq.aliyun.com/articles/486069?spm=5176.10695662.1996646101.searchclickresult.37e0a3dbrOPWp6" target="_blank" rel="noopener">https://yq.aliyun.com/articles/486069?spm=5176.10695662.1996646101.searchclickresult.37e0a3dbrOPWp6</a></p>
+<h2 id="三、相关配置参数介绍"><a href="#三、相关配置参数介绍" class="headerlink" title="三、相关配置参数介绍"></a>三、相关配置参数介绍</h2><ul>
+<li>namesrvAddr= 192.168.100.131:9876;  192.168.100.132:9876<br>  NamerServer 的地址，可以是多个 。 </li>
+<li>brokerClusterName=DefaultCluster<br>  Cluster 的地址，如果集群机器数比较多，可以分成多个 Cluster，每个 Cluster 供一个业    务 群使用 。 </li>
+<li>brokerName=broker- a<br> Broker 的名称， Master 和 Slave 通过使用相同的 Broker 名称来表明相互关系，以说明某个 Slave 是哪个 Master 的 Slave。 </li>
+<li>brokerid=0<br>  一个 Master Barker可以有多个 Slave, 0表示 Master，大于 0表示不同 Slave 的 ID。 </li>
+<li>fileReservedTime=48<br>  在磁盘上保存消息的时长，单位是小时，自动删除超时的消息 。 </li>
+<li>deleteWhen=04<br>  与 fileReservedTim巳参数呼应，表明在几点做消息删除动作，默认值 04表 示凌晨 4点。 </li>
+<li>brokerRole=SYNC MASTER<br>  brokerRole 有 3 种: SYNC MASTER、 ASYNC MASTER、 SLAVE。<br>  前两个是master，第三个是slave。 Master的前缀代表主从复制方式，异步复制和同步    复制</li>
+<li>flushDiskType=ASYNC FLUSH<br>  flushDiskType表示刷盘策略，分为SYNC_FLUSH和ASYNC_FLUSH两 种，分别代表同步刷     盘和异步刷盘。 同步刷盘情况下，消息真正写人磁盘后再 返回成功状态;异步刷盘情况    下，消息写入 page_cache 后就返回成功状态 。 </li>
+<li>listenPort=l0911<br>  Broker监听的端口 号，如果一台机器上启动了多个 Broker， 则要设置不同 的端口号，     避免冲突 。</li>
+<li>storePathRootDir=/home/rocketmq/store - a<br>  存储消息以及一些配置信息的根目录 。 </li>
+</ul>
+<h2 id="四、配置过程踩过的一些坑"><a href="#四、配置过程踩过的一些坑" class="headerlink" title="四、配置过程踩过的一些坑"></a>四、配置过程踩过的一些坑</h2><p><strong>坑1：</strong><br>下载不同版本rocketmq时，要注意其要求的jdk版本<br>原因，高版本rocketmq中有MaxMetaspaceSize参数，MaxMetaspaceSize为Java8中新引入的参数</p>
+<p><strong>坑2</strong>：<br>启动mqnamesev时候报：<br>Java HotSpot 64-Bit Server VM warning: INFO: os::commit_memory(0x00000006c0000000, 2147483648, 0) failed; error=’Cannot allocate memory’ (errno=12)<br>则需要调整rocketMQ的内存</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">vim bin/runserver.sh </span><br><span class="line">JAVA_OPT=<span class="string">"$&#123;JAVA_OPT&#125; -server -Xms128m -Xmx256m -Xmn256m -XX:PermSize=128m -XX:MaxPermSize=320m"</span></span><br></pre></td></tr></table></figure>
+<p>-Xms 的值一定要比 -Xmx 要小不让，也会报错：<br>Initial heap size set to a larger value than the maximum heap size</p>
+<p>启动mqbroker时报，则修改:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">vim bin/runbroker.sh</span><br><span class="line">JAVA_OPT=<span class="string">"$&#123;JAVA_OPT&#125; -server -Xms256m -Xmx256m -Xmn128m"</span></span><br></pre></td></tr></table></figure>
+
+
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="http://www.liruigao.top/index.html">主页</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/article.html">创作</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/photos.html">摄影</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/blog.html">博客</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/about.html">关于我</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/contact.html">联系我</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#一、RocketMQ的下载"><span class="toc-number">1.</span> <span class="toc-text">一、RocketMQ的下载</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#二、RocketMQ环境搭建"><span class="toc-number">2.</span> <span class="toc-text">二、RocketMQ环境搭建</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#材料准备"><span class="toc-number">2.0.1.</span> <span class="toc-text">材料准备</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#配置步骤"><span class="toc-number">2.0.2.</span> <span class="toc-text">配置步骤</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#三、相关配置参数介绍"><span class="toc-number">3.</span> <span class="toc-text">三、相关配置参数介绍</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#四、配置过程踩过的一些坑"><span class="toc-number">4.</span> <span class="toc-text">四、配置过程踩过的一些坑</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E7%9A%84%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E4%B8%8E%E7%9B%B8%E5%85%B3%E9%85%8D%E7%BD%AE/" target="_blank" rel="noopener"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E7%9A%84%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E4%B8%8E%E7%9B%B8%E5%85%B3%E9%85%8D%E7%BD%AE/&text=RocketMQ的环境搭建与相关配置" target="_blank" rel="noopener"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E7%9A%84%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E4%B8%8E%E7%9B%B8%E5%85%B3%E9%85%8D%E7%BD%AE/&title=RocketMQ的环境搭建与相关配置" target="_blank" rel="noopener"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E7%9A%84%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E4%B8%8E%E7%9B%B8%E5%85%B3%E9%85%8D%E7%BD%AE/&is_video=false&description=RocketMQ的环境搭建与相关配置" target="_blank" rel="noopener"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=RocketMQ的环境搭建与相关配置&body=Check out this article: http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E7%9A%84%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E4%B8%8E%E7%9B%B8%E5%85%B3%E9%85%8D%E7%BD%AE/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E7%9A%84%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E4%B8%8E%E7%9B%B8%E5%85%B3%E9%85%8D%E7%BD%AE/&title=RocketMQ的环境搭建与相关配置" target="_blank" rel="noopener"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E7%9A%84%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E4%B8%8E%E7%9B%B8%E5%85%B3%E9%85%8D%E7%BD%AE/&title=RocketMQ的环境搭建与相关配置" target="_blank" rel="noopener"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E7%9A%84%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E4%B8%8E%E7%9B%B8%E5%85%B3%E9%85%8D%E7%BD%AE/&title=RocketMQ的环境搭建与相关配置" target="_blank" rel="noopener"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E7%9A%84%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E4%B8%8E%E7%9B%B8%E5%85%B3%E9%85%8D%E7%BD%AE/&title=RocketMQ的环境搭建与相关配置" target="_blank" rel="noopener"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E7%9A%84%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E4%B8%8E%E7%9B%B8%E5%85%B3%E9%85%8D%E7%BD%AE/&name=RocketMQ的环境搭建与相关配置&description=" target="_blank" rel="noopener"><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://news.ycombinator.com/submitlink?u=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E7%9A%84%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E4%B8%8E%E7%9B%B8%E5%85%B3%E9%85%8D%E7%BD%AE/&t=RocketMQ的环境搭建与相关配置" target="_blank" rel="noopener"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2020 liruigao.top
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="http://www.liruigao.top/index.html">主页</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/article.html">创作</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/photos.html">摄影</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/blog.html">博客</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/about.html">关于我</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/contact.html">联系我</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+<link rel="stylesheet" href="/cactus_blog/lib/font-awesome/css/all.min.css">
+
+
+<link rel="stylesheet" href="/cactus_blog/lib/justified-gallery/css/justifiedGallery.min.css">
+
+
+    <!-- jquery -->
+
+<script src="/cactus_blog/lib/jquery/jquery.min.js"></script>
+
+
+<script src="/cactus_blog/lib/justified-gallery/js/jquery.justifiedGallery.min.js"></script>
+
+<!-- clipboard -->
+
+  
+<script src="/cactus_blog/lib/clipboard/clipboard.min.js"></script>
+
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="far fa-clone"></i>';
+    btn += '</span>'; 
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/cactus_blog/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Google Analytics -->
+
+<!-- Baidu Analytics -->
+
+<!-- Disqus Comments -->
+
+
+</body>
+</html>

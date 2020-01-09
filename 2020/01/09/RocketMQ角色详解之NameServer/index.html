@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="一、NameServer的功能NameServer是整个消息队列中的状态服务器，集群的各个组件通过它来了解全局的信息 。  需要了解的两个知识：  热备份： NamServer可以部署多个，相互之间独立，其他角色同时向多个NameServer 机器上报状态信息。 心跳机制： NameServer 中的 Broker、 Topic等状态信息不会持久存储，都是由各个角色定时上报并存储到内存中，超时不上">
+<meta property="og:type" content="article">
+<meta property="og:title" content="RocketMQ角色详解之NameServer">
+<meta property="og:url" content="http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E8%A7%92%E8%89%B2%E8%AF%A6%E8%A7%A3%E4%B9%8BNameServer/index.html">
+<meta property="og:site_name" content="瑞高的博客空间">
+<meta property="og:description" content="一、NameServer的功能NameServer是整个消息队列中的状态服务器，集群的各个组件通过它来了解全局的信息 。  需要了解的两个知识：  热备份： NamServer可以部署多个，相互之间独立，其他角色同时向多个NameServer 机器上报状态信息。 心跳机制： NameServer 中的 Broker、 Topic等状态信息不会持久存储，都是由各个角色定时上报并存储到内存中，超时不上">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2020-01-09T12:34:51.000Z">
+<meta property="article:modified_time" content="2020-01-09T12:42:43.651Z">
+<meta property="article:author" content="liruigao.top">
+<meta name="twitter:card" content="summary">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="/cactus_blog/images/favicon.ico">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="/cactus_blog/images/favicon-192x192.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="/cactus_blog/images/apple-touch-icon.png">
+          
+        
+    
+    <!-- title -->
+    <title>RocketMQ角色详解之NameServer</title>
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/cactus_blog/css/style.css">
+
+    <!-- persian styles -->
+    
+      
+<link rel="stylesheet" href="/cactus_blog/css/rtl.css">
+
+    
+    <!-- rss -->
+    
+    
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="http://www.liruigao.top/index.html">主页</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/article.html">创作</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/photos.html">摄影</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/blog.html">博客</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/about.html">关于我</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/contact.html">联系我</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" href="/cactus_blog/2020/01/09/RocketMQ%E8%A7%92%E8%89%B2%E8%AF%A6%E8%A7%A3%E4%B9%8BBroker/"><i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" href="/cactus_blog/2020/01/09/posts-RocketMQ%E8%A7%92%E8%89%B2%E8%AF%A6%E8%A7%A3%E4%B9%8BConsumer-md/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E8%A7%92%E8%89%B2%E8%AF%A6%E8%A7%A3%E4%B9%8BNameServer/" target="_blank" rel="noopener"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E8%A7%92%E8%89%B2%E8%AF%A6%E8%A7%A3%E4%B9%8BNameServer/&text=RocketMQ角色详解之NameServer" target="_blank" rel="noopener"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E8%A7%92%E8%89%B2%E8%AF%A6%E8%A7%A3%E4%B9%8BNameServer/&title=RocketMQ角色详解之NameServer" target="_blank" rel="noopener"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E8%A7%92%E8%89%B2%E8%AF%A6%E8%A7%A3%E4%B9%8BNameServer/&is_video=false&description=RocketMQ角色详解之NameServer" target="_blank" rel="noopener"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=RocketMQ角色详解之NameServer&body=Check out this article: http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E8%A7%92%E8%89%B2%E8%AF%A6%E8%A7%A3%E4%B9%8BNameServer/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E8%A7%92%E8%89%B2%E8%AF%A6%E8%A7%A3%E4%B9%8BNameServer/&title=RocketMQ角色详解之NameServer" target="_blank" rel="noopener"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E8%A7%92%E8%89%B2%E8%AF%A6%E8%A7%A3%E4%B9%8BNameServer/&title=RocketMQ角色详解之NameServer" target="_blank" rel="noopener"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E8%A7%92%E8%89%B2%E8%AF%A6%E8%A7%A3%E4%B9%8BNameServer/&title=RocketMQ角色详解之NameServer" target="_blank" rel="noopener"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E8%A7%92%E8%89%B2%E8%AF%A6%E8%A7%A3%E4%B9%8BNameServer/&title=RocketMQ角色详解之NameServer" target="_blank" rel="noopener"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E8%A7%92%E8%89%B2%E8%AF%A6%E8%A7%A3%E4%B9%8BNameServer/&name=RocketMQ角色详解之NameServer&description=" target="_blank" rel="noopener"><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://news.ycombinator.com/submitlink?u=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E8%A7%92%E8%89%B2%E8%AF%A6%E8%A7%A3%E4%B9%8BNameServer/&t=RocketMQ角色详解之NameServer" target="_blank" rel="noopener"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#一、NameServer的功能"><span class="toc-number">1.</span> <span class="toc-text">一、NameServer的功能</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#二、NameServer的集群状态存储结构"><span class="toc-number">2.</span> <span class="toc-text">二、NameServer的集群状态存储结构</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#三、为什么不用已有的Zookeeper？"><span class="toc-number">3.</span> <span class="toc-text">三、为什么不用已有的Zookeeper？</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        RocketMQ角色详解之NameServer
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">瑞高的博客空间</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2020-01-09T12:34:51.000Z" itemprop="datePublished">2020-01-09</time>
+        
+      
+    </div>
+
+
+      
+
+      
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <h3 id="一、NameServer的功能"><a href="#一、NameServer的功能" class="headerlink" title="一、NameServer的功能"></a>一、NameServer的功能</h3><p><strong>NameServer是整个消息队列中的状态服务器，集群的各个组件通过它来了解全局的信息 。</strong> </p>
+<p>需要了解的两个知识：</p>
+<ul>
+<li>热备份： NamServer可以部署多个，相互之间独立，其他角色同时向多个NameServer 机器上报状态信息。</li>
+<li>心跳机制： NameServer 中的 Broker、 Topic等状态信息不会持久存储，都是由各个角色定时上报并存储到内存中，超时不上报的话， NameServer会认为某个机器出故障不可用了，其他组件会把这个机器从可用列表里移除 。 （每 10秒检查一次，时间戳超过 2分钟则认为Broker已失效。)</li>
+</ul>
+<h3 id="二、NameServer的集群状态存储结构"><a href="#二、NameServer的集群状态存储结构" class="headerlink" title="二、NameServer的集群状态存储结构"></a>二、NameServer的集群状态存储结构</h3><p><strong>集群的状态就保存于五个变量中，NameServer 的主要工作就是维护这五个变量中存储的信息。</strong></p>
+<p><strong>1.private final HashMap&lt;String， List<QueueData>&gt; topicQueueTable</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"> Key 是 Topic 的名称，它存储了所有Topic 的属性信息 。</span><br><span class="line">Value 是个 QueueData 队列,队里的长度等于这个 Topic 数据存储的 MasterBroker的个数。</span><br><span class="line">QueueData里存储着 Broker的名称、 读写queue的数量、 同步标识等。</span><br></pre></td></tr></table></figure>
+
+<p><strong>2.private final HashMap&lt;String， BrokerData&gt; Broker- AddrTable</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">这个结构存储着一个 BrokerName 对应的属性信 息，</span><br><span class="line">包括所属的 Cluster 名称，Master Broker 和多个 Slave Broker 的地址信息 。</span><br></pre></td></tr></table></figure>
+
+<p><strong>3.private final HashMap&lt;String， Set<String>&gt; ClusterAddrTable</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">存储的是集群中 Cluster 的信息</span><br><span class="line">Cluster 名称对应一个由 BrokerName组成的集合</span><br></pre></td></tr></table></figure>
+
+<p><strong>4.private final HashMap&lt;String， BrokerLivelnfo&gt; Broker- LiveTable</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">BrokerLiveTable 存储的内容是这台 Broker机器的实时状态，</span><br><span class="line">包括上次更新状态的时间戳， NameServer会定期检查这个时间戳，超时没有更新就认为这个 Broker无效了，将其从 Broker列表里清除。</span><br></pre></td></tr></table></figure>
+
+<p><strong>5.private fina l HashMap&lt;String ， List<String>&gt; filterServerTable</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Filter Server是过滤服务器，是 RocketMQ 的一种服务端过滤方式。</span><br><span class="line">一个Broker可以有一个或多个Filter Server。 </span><br><span class="line">Key 是 Broker 的地址</span><br><span class="line">Value 是和这个 Broker关联的多个 Filter Server 的地址 。</span><br></pre></td></tr></table></figure>
+
+<h3 id="三、为什么不用已有的Zookeeper？"><a href="#三、为什么不用已有的Zookeeper？" class="headerlink" title="三、为什么不用已有的Zookeeper？"></a>三、为什么不用已有的Zookeeper？</h3><p>ZooKeeper 的功能很强大，包括自动 Master 选举等， RocketMQ 的架构设计决定了它不需要进行 Master选举，用不到这些复杂的功能，只需要一个轻量级的元数据服务器就足够了 。<br>中间件对稳定性要求很高， RocketMQ的 NameServer只有很少的代码，容易维护，所以不需要再依赖另一个中间件，从而减少整体维护成本 。</p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="http://www.liruigao.top/index.html">主页</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/article.html">创作</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/photos.html">摄影</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/blog.html">博客</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/about.html">关于我</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/contact.html">联系我</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#一、NameServer的功能"><span class="toc-number">1.</span> <span class="toc-text">一、NameServer的功能</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#二、NameServer的集群状态存储结构"><span class="toc-number">2.</span> <span class="toc-text">二、NameServer的集群状态存储结构</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#三、为什么不用已有的Zookeeper？"><span class="toc-number">3.</span> <span class="toc-text">三、为什么不用已有的Zookeeper？</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E8%A7%92%E8%89%B2%E8%AF%A6%E8%A7%A3%E4%B9%8BNameServer/" target="_blank" rel="noopener"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E8%A7%92%E8%89%B2%E8%AF%A6%E8%A7%A3%E4%B9%8BNameServer/&text=RocketMQ角色详解之NameServer" target="_blank" rel="noopener"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E8%A7%92%E8%89%B2%E8%AF%A6%E8%A7%A3%E4%B9%8BNameServer/&title=RocketMQ角色详解之NameServer" target="_blank" rel="noopener"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E8%A7%92%E8%89%B2%E8%AF%A6%E8%A7%A3%E4%B9%8BNameServer/&is_video=false&description=RocketMQ角色详解之NameServer" target="_blank" rel="noopener"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=RocketMQ角色详解之NameServer&body=Check out this article: http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E8%A7%92%E8%89%B2%E8%AF%A6%E8%A7%A3%E4%B9%8BNameServer/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E8%A7%92%E8%89%B2%E8%AF%A6%E8%A7%A3%E4%B9%8BNameServer/&title=RocketMQ角色详解之NameServer" target="_blank" rel="noopener"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E8%A7%92%E8%89%B2%E8%AF%A6%E8%A7%A3%E4%B9%8BNameServer/&title=RocketMQ角色详解之NameServer" target="_blank" rel="noopener"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E8%A7%92%E8%89%B2%E8%AF%A6%E8%A7%A3%E4%B9%8BNameServer/&title=RocketMQ角色详解之NameServer" target="_blank" rel="noopener"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E8%A7%92%E8%89%B2%E8%AF%A6%E8%A7%A3%E4%B9%8BNameServer/&title=RocketMQ角色详解之NameServer" target="_blank" rel="noopener"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E8%A7%92%E8%89%B2%E8%AF%A6%E8%A7%A3%E4%B9%8BNameServer/&name=RocketMQ角色详解之NameServer&description=" target="_blank" rel="noopener"><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://news.ycombinator.com/submitlink?u=http://www.liruigao.top/cactus_blog/2020/01/09/RocketMQ%E8%A7%92%E8%89%B2%E8%AF%A6%E8%A7%A3%E4%B9%8BNameServer/&t=RocketMQ角色详解之NameServer" target="_blank" rel="noopener"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2020 liruigao.top
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="http://www.liruigao.top/index.html">主页</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/article.html">创作</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/photos.html">摄影</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/blog.html">博客</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/about.html">关于我</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/contact.html">联系我</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+<link rel="stylesheet" href="/cactus_blog/lib/font-awesome/css/all.min.css">
+
+
+<link rel="stylesheet" href="/cactus_blog/lib/justified-gallery/css/justifiedGallery.min.css">
+
+
+    <!-- jquery -->
+
+<script src="/cactus_blog/lib/jquery/jquery.min.js"></script>
+
+
+<script src="/cactus_blog/lib/justified-gallery/js/jquery.justifiedGallery.min.js"></script>
+
+<!-- clipboard -->
+
+  
+<script src="/cactus_blog/lib/clipboard/clipboard.min.js"></script>
+
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="far fa-clone"></i>';
+    btn += '</span>'; 
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/cactus_blog/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Google Analytics -->
+
+<!-- Baidu Analytics -->
+
+<!-- Disqus Comments -->
+
+
+</body>
+</html>
