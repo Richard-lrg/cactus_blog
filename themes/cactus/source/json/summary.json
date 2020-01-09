@@ -1,41 +1,23 @@
-{
-  "blogs" : [
-    {
-      "title": "hello-world",
-      "date": "2019.12.30",
-      "content": "这是一个hello word文件",
-      "image": "http://imgs.aixifan.com/content/2016_07_10/1468158502.gif",
-      "path": "2019/12/30/hello-world/"
-    },
-    {
-      "title": "image test",
-      "date": "2019-12-30",
-      "content": "这是一个图片测试",
-      "image": "http://www.liruigao.top/cactus_blog/2019/12/30/image-test/imagetest.png",
-      "path": "2019/12/30/image-test/"
-    },
-    {
-      "title": "firstBlog",
-      "date": "2019.12.27",
-      "content": "这是一个测试文件",
-      "image": "http://www.liruigao.top/cactus_blog/2019/12/30/image-test/imagetest.png",
-      "path": "2019/12/27/firstBlog/"
-    }
-  ],
-  "articles" : [
-    {
-      "title": "hello-world",
-      "date": "2020.01.09",
-      "content": "这是一个hello word文件",
-      "image": "http://img3.imgtn.bdimg.com/it/u=4279473858,1468936459&fm=26&gp=0.jpg",
-      "path": "2020/01/09/hello-world/"
-    },
-    {
-      "title": "test",
-      "date": "2020.01.09",
-      "content": "这是一次尝试",
-      "image": "http://www.liruigao.top/cactus_article/2020/01/09/test/mh.gif",
-      "path": "2020/01/09/test/"
-    }
-  ]
-}
+[
+  {
+    "title": "hello-world",
+    "date": "2019.12.30",
+    "content": "这是一个hello word文件",
+    "image": "http://imgs.aixifan.com/content/2016_07_10/1468158502.gif",
+    "path": "2019/12/30/hello-world/"
+  },
+  {
+    "title": "image test",
+    "date": "2019-12-30",
+    "content": "这是一个图片测试",
+    "image": "http://www.liruigao.top/cactus_blog/2019/12/30/image-test/imagetest.png",
+    "path": "2019/12/30/image-test/"
+  },
+  {
+    "title": "firstBlog",
+    "date": "2019.12.27",
+    "content": "这是一个测试文件",
+    "image": "http://www.liruigao.top/cactus_blog/2019/12/30/image-test/imagetest.png",
+    "path": "2019/12/27/firstBlog/"
+  }
+]
