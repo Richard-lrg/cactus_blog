@@ -25,10 +25,17 @@
   "articles" : [
     {
       "title": "hello-world",
-      "date": "2019.12.30",
+      "date": "2020.01.09",
       "content": "这是一个hello word文件",
       "image": "http://img3.imgtn.bdimg.com/it/u=4279473858,1468936459&fm=26&gp=0.jpg",
-      "path": "http://www.liruigao.top/cactus_blog/2019/12/30/hello-world/"
+      "path": "http://www.liruigao.top/cactus_article/2020/01/09/hello-world/"
+    },
+    {
+      "title": "test",
+      "date": "2020.01.09",
+      "content": "这是一次尝试",
+      "image": "http://www.liruigao.top/cactus_article/2020/01/09/test/mh.gif",
+      "path": "http://www.liruigao.top/cactus_article/2020/01/09/test/"
     }
   ]
 }
