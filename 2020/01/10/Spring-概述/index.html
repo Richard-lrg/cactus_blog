@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="一、Spring概述 The Spring Framework is an application framework and inversion of control container for the Java platform. The framework’s core features can be used by any Java application, but there are e">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring 概述">
+<meta property="og:url" content="http://www.liruigao.top/cactus_blog/2020/01/10/Spring-%E6%A6%82%E8%BF%B0/index.html">
+<meta property="og:site_name" content="瑞高的博客空间">
+<meta property="og:description" content="一、Spring概述 The Spring Framework is an application framework and inversion of control container for the Java platform. The framework’s core features can be used by any Java application, but there are e">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20191011161754478.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0NhY3R1c19Mcmc=,size_16,color_FFFFFF,t_70">
+<meta property="article:published_time" content="2020-01-10T03:14:53.000Z">
+<meta property="article:modified_time" content="2020-01-10T03:33:42.052Z">
+<meta property="article:author" content="liruigao.top">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/20191011161754478.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0NhY3R1c19Mcmc=,size_16,color_FFFFFF,t_70">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="/cactus_blog/images/favicon.ico">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="/cactus_blog/images/favicon-192x192.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="/cactus_blog/images/apple-touch-icon.png">
+          
+        
+    
+    <!-- title -->
+    <title>Spring 概述</title>
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/cactus_blog/css/style.css">
+
+    <!-- persian styles -->
+    
+      
+<link rel="stylesheet" href="/cactus_blog/css/rtl.css">
+
+    
+    <!-- rss -->
+    
+    
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="http://www.liruigao.top/index.html">主页</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/article.html">创作</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/photos.html">摄影</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/blog.html">博客</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/about.html">关于我</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/contact.html">联系我</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" href="/cactus_blog/2020/01/10/Spring%E9%A1%B9%E7%9B%AE%E5%BF%AB%E9%80%9F%E6%90%AD%E5%BB%BA/"><i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" href="/cactus_blog/2020/01/09/RocketMQ%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF%E4%B9%8B%E5%90%9E%E5%90%90%E9%87%8F%E4%BC%98%E5%85%88Case/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://www.liruigao.top/cactus_blog/2020/01/10/Spring-%E6%A6%82%E8%BF%B0/" target="_blank" rel="noopener"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://www.liruigao.top/cactus_blog/2020/01/10/Spring-%E6%A6%82%E8%BF%B0/&text=Spring 概述" target="_blank" rel="noopener"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://www.liruigao.top/cactus_blog/2020/01/10/Spring-%E6%A6%82%E8%BF%B0/&title=Spring 概述" target="_blank" rel="noopener"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://www.liruigao.top/cactus_blog/2020/01/10/Spring-%E6%A6%82%E8%BF%B0/&is_video=false&description=Spring 概述" target="_blank" rel="noopener"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Spring 概述&body=Check out this article: http://www.liruigao.top/cactus_blog/2020/01/10/Spring-%E6%A6%82%E8%BF%B0/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://www.liruigao.top/cactus_blog/2020/01/10/Spring-%E6%A6%82%E8%BF%B0/&title=Spring 概述" target="_blank" rel="noopener"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://www.liruigao.top/cactus_blog/2020/01/10/Spring-%E6%A6%82%E8%BF%B0/&title=Spring 概述" target="_blank" rel="noopener"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://www.liruigao.top/cactus_blog/2020/01/10/Spring-%E6%A6%82%E8%BF%B0/&title=Spring 概述" target="_blank" rel="noopener"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://www.liruigao.top/cactus_blog/2020/01/10/Spring-%E6%A6%82%E8%BF%B0/&title=Spring 概述" target="_blank" rel="noopener"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://www.liruigao.top/cactus_blog/2020/01/10/Spring-%E6%A6%82%E8%BF%B0/&name=Spring 概述&description=" target="_blank" rel="noopener"><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://news.ycombinator.com/submitlink?u=http://www.liruigao.top/cactus_blog/2020/01/10/Spring-%E6%A6%82%E8%BF%B0/&t=Spring 概述" target="_blank" rel="noopener"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-5"><a class="toc-link" href="#一、Spring概述"><span class="toc-number">1.</span> <span class="toc-text">一、Spring概述</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#二、Spring的模块"><span class="toc-number">2.</span> <span class="toc-text">二、Spring的模块</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#三、Spring的生态"><span class="toc-number">3.</span> <span class="toc-text">三、Spring的生态</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#1-Spring-Boot"><span class="toc-number">3.1.</span> <span class="toc-text">1.Spring Boot</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#2-Spring-Cloud"><span class="toc-number">3.2.</span> <span class="toc-text">2.Spring Cloud</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#3-Spring-Cloud-Data-Flow"><span class="toc-number">3.3.</span> <span class="toc-text">3.Spring Cloud Data Flow</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#4-Spring-Data"><span class="toc-number">3.4.</span> <span class="toc-text">4.Spring Data</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#5-Spring-Integration"><span class="toc-number">3.5.</span> <span class="toc-text">5.Spring Integration</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#6-Spring-Batch"><span class="toc-number">3.6.</span> <span class="toc-text">6.Spring Batch</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#7-Spring-Security"><span class="toc-number">3.7.</span> <span class="toc-text">7.Spring Security</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#8-Spring-HATEOAS"><span class="toc-number">3.8.</span> <span class="toc-text">8.Spring HATEOAS</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#9-Spring-REST-Docs"><span class="toc-number">3.9.</span> <span class="toc-text">9.Spring REST Docs</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#10-Spring-AMQP"><span class="toc-number">3.10.</span> <span class="toc-text">10.Spring AMQP</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#11-Spring-Mobile"><span class="toc-number">3.11.</span> <span class="toc-text">11.Spring Mobile</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#12-Spring-For-Android"><span class="toc-number">3.12.</span> <span class="toc-text">12.Spring For Android</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#13-Spring-Web-Flow"><span class="toc-number">3.13.</span> <span class="toc-text">13.Spring Web Flow</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#14-Spring-Web-Services"><span class="toc-number">3.14.</span> <span class="toc-text">14.Spring Web Services</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#15-Spring-LDAP"><span class="toc-number">3.15.</span> <span class="toc-text">15.Spring LDAP</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#16-Spring-Session"><span class="toc-number">3.16.</span> <span class="toc-text">16.Spring Session</span></a></li></ol></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        Spring 概述
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">瑞高的博客空间</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2020-01-10T03:14:53.000Z" itemprop="datePublished">2020-01-10</time>
+        
+      
+    </div>
+
+
+      
+
+      
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <h5 id="一、Spring概述"><a href="#一、Spring概述" class="headerlink" title="一、Spring概述"></a>一、Spring概述</h5><blockquote>
+<p>The Spring Framework is an application framework and inversion of control container for the Java platform. The framework’s core features can be used by any Java application, but there are extensions for building web applications on top of the Java EE (Enterprise Edition) platform. Although the framework does not impose any specific programming model, it has become popular in the Java community as an addition to, or even replacement for the Enterprise JavaBeans (EJB) model. The Spring Framework is open source.</p>
+</blockquote>
+<blockquote>
+<p>Spring框架是 Java 平台的一个开源的全栈（Full-stack）应用程序框架和控制反转容器实现，一般被直接称为 Spring。该框架的一些核心功能理论上可用于任何 Java 应用，但 Spring 还为基于Java企业版平台构建的 Web 应用提供了大量的拓展支持。虽然 Spring 没有直接实现任何的编程模型，但它已经在 Java 社区中广为流行，基本上完全代替了企业级JavaBeans（EJB）模型。且Spring框架是开源的。</p>
+</blockquote>
+<h5 id="二、Spring的模块"><a href="#二、Spring的模块" class="headerlink" title="二、Spring的模块"></a>二、Spring的模块</h5><p><img src="https://img-blog.csdnimg.cn/20191011161754478.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0NhY3R1c19Mcmc=,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<p>Spring是模块化的，这意味着你可以只使用你需要的Spring模块。</p>
+<table>
+<thead>
+<tr>
+<th>Core Container</th>
+<th></th>
+<th>AOP</th>
+<th></th>
+<th>Messaging</th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Spring-Core</td>
+<td>核心工具类，其他模块大量使用Spring-Core</td>
+<td>Spring-AOP</td>
+<td>基于代理的AOP支持</td>
+<td>Spring-Messaging</td>
+<td>对消息架构和协议的支持</td>
+</tr>
+<tr>
+<td>Spring-Beans</td>
+<td>定义对Bean的支持</td>
+<td>Spring-Aspects</td>
+<td>基于AspectJ的AOP支持</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Spring-Context</td>
+<td>运行时的Spring容器</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Spring-Context-Suppot</td>
+<td>Spring容器对第三方包的集成支持</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Spring-Expression</td>
+<td>使用表达式语言在运行时查询和操作对象</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<table>
+<thead>
+<tr>
+<th>Web</th>
+<th></th>
+<th>Data Access</th>
+<th></th>
+<th>Test</th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Spring-web</td>
+<td>提供基础的web集成的功能</td>
+<td>Spring-JDBC</td>
+<td>提供以JDBC访问数据库的支持</td>
+<td>Test模块主要是针对spring的各个模块做各种各样的测试，包括单元测试、集成测试等等。</td>
+<td></td>
+</tr>
+<tr>
+<td>Spring-Webmvc</td>
+<td>提供基于Servlet的SpringMVC</td>
+<td>Spring-TX</td>
+<td>提供编程式和声明式的事务支持</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Spring-WebSocket</td>
+<td>提供WebSocket功能</td>
+<td>Spring-ORM</td>
+<td>提供对对象/关系映射技术的支持</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Spring-Webmvc-Portlet</td>
+<td>提供Portlet环境支持</td>
+<td>Spring-OXM</td>
+<td>提供对对象/xml映射技术的支持</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>Spring-JMS</td>
+<td>提供对JMS的支持</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<h5 id="三、Spring的生态"><a href="#三、Spring的生态" class="headerlink" title="三、Spring的生态"></a>三、Spring的生态</h5><blockquote>
+<h6 id="1-Spring-Boot"><a href="#1-Spring-Boot" class="headerlink" title="1.Spring Boot"></a>1.Spring Boot</h6><p>Spring Boot是一个开发基于Spring的脚手架项目，它默认集成了嵌入式Tomcat，配置注解化，支持快速集成第三方开发组件（如MyBatis），大大降低了使用Spring的门槛，而且内置了许多可以直接用于生产环境的功能，是目前用于开发微服务架构项目的不二选择。</p>
+<h6 id="2-Spring-Cloud"><a href="#2-Spring-Cloud" class="headerlink" title="2.Spring Cloud"></a>2.Spring Cloud</h6><p>Spring Cloud为开发基于微服务架构的软件系统提供了一整套工具集合，其中包含了开发各个微服务组件的具体项目，如：Spring Cloud Config（配置中心），Spring Cloud Netflix（服务注册中心），Spring Cloud Sleuth（服务调用监控），Spring Cloud Gateway（服务网关）等等。<br>Spring Cloud的基础是Spring Boot，基于Spring Boot可以大大简化开发各微服务组件的流程。</p>
+<h6 id="3-Spring-Cloud-Data-Flow"><a href="#3-Spring-Cloud-Data-Flow" class="headerlink" title="3.Spring Cloud Data Flow"></a>3.Spring Cloud Data Flow</h6><p>Spring Cloud Data Flow用于构建在云环境或K8S中基于微服务的实时或批数据处理架构，具体来讲就是支持一系列需要进行数据处理的场景，如：ETL，数据导入/导出，事件流，预测分析等等。</p>
+<h6 id="4-Spring-Data"><a href="#4-Spring-Data" class="headerlink" title="4.Spring Data"></a>4.Spring Data</h6><p>Spring Data旨在提供一套基于Spring编程模型的数据访问API，是一个数据访问框架集合，其中包含了多个具体的支持不同方式访问特定数据库类型的子模块，如：Spring Data JDBC（使用JDBC方式访问关系型数据库），Spring Data MongoDB（访问MongoDB数据库）等。</p>
+<h6 id="5-Spring-Integration"><a href="#5-Spring-Integration" class="headerlink" title="5.Spring Integration"></a>5.Spring Integration</h6><p>Spring Integration的目的是提供一个简单的模型，用于构建企业级应用集成解决方案。</p>
+<h6 id="6-Spring-Batch"><a href="#6-Spring-Batch" class="headerlink" title="6.Spring Batch"></a>6.Spring Batch</h6><p>Spring Batch是一个轻量级的批处理框架，旨在开发对企业系统日常运营至关重要的强大批处理应用程序。<br>支持事务管理，提供了基于Web的管理接口。</p>
+<h6 id="7-Spring-Security"><a href="#7-Spring-Security" class="headerlink" title="7.Spring Security"></a>7.Spring Security</h6><p>Spring Security是用于实现认证和授权，以及访问控制的安全框架，在Java生态与之提供类似的功能还有一个框架：Apache Shiro。<br>Spring Security依赖于Spring Framework，也就是说如果要Spring Security，那么应用架构也必须是基于Spring Framework的，这大大限制了Spring Security的使用场景；反之，Shiro就没有这样限制，而且从项目架构上Shiro更加简洁。当然，Spring Security提供了非常丰富的安全控制的功能，在某些方面甚至比Shiro更加完善，与之对应的是掌握的Spring Security的复杂度比较大。因此，对于在应用中是否选择Spring Security需要根据实际需求来决定。</p>
+<h6 id="8-Spring-HATEOAS"><a href="#8-Spring-HATEOAS" class="headerlink" title="8.Spring HATEOAS"></a>8.Spring HATEOAS</h6><p>如果Web应用基于Spring框架（即：使用了Spring MVC）开发，那么可以直接使用Spring HATEOAS来开发满足HATEOAS约束的RESTFul服务。<br>这里需要理解一个单词简写：“HATEOAS”。HATEOAS（Hypermedia as the engine of application state）是REST架构风格中最复杂的约束，也是构建成熟REST服务的核心。它的重要性在于打破了客户端和服务器之间严格的契约，使得客户端可以更加智能和自适应，而 REST 服务本身的演化和更新也变得更加容易。</p>
+<h6 id="9-Spring-REST-Docs"><a href="#9-Spring-REST-Docs" class="headerlink" title="9.Spring REST Docs"></a>9.Spring REST Docs</h6><p>Spring REST Docs是一个文档工具，用于为REST架构风格的Web服务自动生成相应的文档，这样可以解放开发者专门撰写API文档的工作。</p>
+<h6 id="10-Spring-AMQP"><a href="#10-Spring-AMQP" class="headerlink" title="10.Spring AMQP"></a>10.Spring AMQP</h6><p>Spring AMQP项目旨在将核心的Spring概念应用于基于AMQP的消息传递解决方案的开发中，它提供了一个“模板”的抽象用于发送和接收消息。</p>
+<h6 id="11-Spring-Mobile"><a href="#11-Spring-Mobile" class="headerlink" title="11.Spring Mobile"></a>11.Spring Mobile</h6><p>Spring Mobile是对Spring MVC的扩展，旨在简化移动Web应用的开发。<br>Spring Mobile可以检测出当前请求使用的设备是PC、还是手机或者是平板以及用户设备是安卓平台还是iOS平台，然后根据请求设备的不同，返回适合该设备的视图。</p>
+<h6 id="12-Spring-For-Android"><a href="#12-Spring-For-Android" class="headerlink" title="12.Spring For Android"></a>12.Spring For Android</h6><p>官方的说法LSpring For Android旨在简化原声Android应用的开发,Spring For Android提供了2个对原生Android应用开发的支持：<br>(1)提供了一个REST客户端<br>(2)支持访问安全API时的认证</p>
+<h6 id="13-Spring-Web-Flow"><a href="#13-Spring-Web-Flow" class="headerlink" title="13.Spring Web Flow"></a>13.Spring Web Flow</h6><p>Spring Web Flow主要应用于需要在Web页面上创建引导用户执行类似“下一步”这样的基于流程的应用场景，该框架构建于Spring MVC之上。</p>
+<h6 id="14-Spring-Web-Services"><a href="#14-Spring-Web-Services" class="headerlink" title="14.Spring Web Services"></a>14.Spring Web Services</h6><p>Spring Web Services用于开发WebService服务，类似的框架如：Apache CXF，Apache Axis2。</p>
+<h6 id="15-Spring-LDAP"><a href="#15-Spring-LDAP" class="headerlink" title="15.Spring LDAP"></a>15.Spring LDAP</h6><p>Spring LDAP是一个工具，用于为基于Spring的应用程序使用LDAP（Lightweight Directory Access Protocol）协议。</p>
+<h6 id="16-Spring-Session"><a href="#16-Spring-Session" class="headerlink" title="16.Spring Session"></a>16.Spring Session</h6><p>Spring Session提供了管理用户Session信息的API和对应实现，Spring Session使得支持集群会话变得简单，而不依赖于特定于应用程序容器的解决方案。</p>
+<p><strong>and so on……</strong><br>更多请看 <a href="https://spring.io/" target="_blank" rel="noopener">https://spring.io/</a></p>
+</blockquote>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="http://www.liruigao.top/index.html">主页</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/article.html">创作</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/photos.html">摄影</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/blog.html">博客</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/about.html">关于我</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/contact.html">联系我</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-5"><a class="toc-link" href="#一、Spring概述"><span class="toc-number">1.</span> <span class="toc-text">一、Spring概述</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#二、Spring的模块"><span class="toc-number">2.</span> <span class="toc-text">二、Spring的模块</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#三、Spring的生态"><span class="toc-number">3.</span> <span class="toc-text">三、Spring的生态</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#1-Spring-Boot"><span class="toc-number">3.1.</span> <span class="toc-text">1.Spring Boot</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#2-Spring-Cloud"><span class="toc-number">3.2.</span> <span class="toc-text">2.Spring Cloud</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#3-Spring-Cloud-Data-Flow"><span class="toc-number">3.3.</span> <span class="toc-text">3.Spring Cloud Data Flow</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#4-Spring-Data"><span class="toc-number">3.4.</span> <span class="toc-text">4.Spring Data</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#5-Spring-Integration"><span class="toc-number">3.5.</span> <span class="toc-text">5.Spring Integration</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#6-Spring-Batch"><span class="toc-number">3.6.</span> <span class="toc-text">6.Spring Batch</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#7-Spring-Security"><span class="toc-number">3.7.</span> <span class="toc-text">7.Spring Security</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#8-Spring-HATEOAS"><span class="toc-number">3.8.</span> <span class="toc-text">8.Spring HATEOAS</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#9-Spring-REST-Docs"><span class="toc-number">3.9.</span> <span class="toc-text">9.Spring REST Docs</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#10-Spring-AMQP"><span class="toc-number">3.10.</span> <span class="toc-text">10.Spring AMQP</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#11-Spring-Mobile"><span class="toc-number">3.11.</span> <span class="toc-text">11.Spring Mobile</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#12-Spring-For-Android"><span class="toc-number">3.12.</span> <span class="toc-text">12.Spring For Android</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#13-Spring-Web-Flow"><span class="toc-number">3.13.</span> <span class="toc-text">13.Spring Web Flow</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#14-Spring-Web-Services"><span class="toc-number">3.14.</span> <span class="toc-text">14.Spring Web Services</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#15-Spring-LDAP"><span class="toc-number">3.15.</span> <span class="toc-text">15.Spring LDAP</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#16-Spring-Session"><span class="toc-number">3.16.</span> <span class="toc-text">16.Spring Session</span></a></li></ol></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://www.liruigao.top/cactus_blog/2020/01/10/Spring-%E6%A6%82%E8%BF%B0/" target="_blank" rel="noopener"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://www.liruigao.top/cactus_blog/2020/01/10/Spring-%E6%A6%82%E8%BF%B0/&text=Spring 概述" target="_blank" rel="noopener"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://www.liruigao.top/cactus_blog/2020/01/10/Spring-%E6%A6%82%E8%BF%B0/&title=Spring 概述" target="_blank" rel="noopener"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://www.liruigao.top/cactus_blog/2020/01/10/Spring-%E6%A6%82%E8%BF%B0/&is_video=false&description=Spring 概述" target="_blank" rel="noopener"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Spring 概述&body=Check out this article: http://www.liruigao.top/cactus_blog/2020/01/10/Spring-%E6%A6%82%E8%BF%B0/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://www.liruigao.top/cactus_blog/2020/01/10/Spring-%E6%A6%82%E8%BF%B0/&title=Spring 概述" target="_blank" rel="noopener"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://www.liruigao.top/cactus_blog/2020/01/10/Spring-%E6%A6%82%E8%BF%B0/&title=Spring 概述" target="_blank" rel="noopener"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://www.liruigao.top/cactus_blog/2020/01/10/Spring-%E6%A6%82%E8%BF%B0/&title=Spring 概述" target="_blank" rel="noopener"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://www.liruigao.top/cactus_blog/2020/01/10/Spring-%E6%A6%82%E8%BF%B0/&title=Spring 概述" target="_blank" rel="noopener"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://www.liruigao.top/cactus_blog/2020/01/10/Spring-%E6%A6%82%E8%BF%B0/&name=Spring 概述&description=" target="_blank" rel="noopener"><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://news.ycombinator.com/submitlink?u=http://www.liruigao.top/cactus_blog/2020/01/10/Spring-%E6%A6%82%E8%BF%B0/&t=Spring 概述" target="_blank" rel="noopener"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2020 liruigao.top
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="http://www.liruigao.top/index.html">主页</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/article.html">创作</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/photos.html">摄影</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/blog.html">博客</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/about.html">关于我</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/contact.html">联系我</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+<link rel="stylesheet" href="/cactus_blog/lib/font-awesome/css/all.min.css">
+
+
+<link rel="stylesheet" href="/cactus_blog/lib/justified-gallery/css/justifiedGallery.min.css">
+
+
+    <!-- jquery -->
+
+<script src="/cactus_blog/lib/jquery/jquery.min.js"></script>
+
+
+<script src="/cactus_blog/lib/justified-gallery/js/jquery.justifiedGallery.min.js"></script>
+
+<!-- clipboard -->
+
+  
+<script src="/cactus_blog/lib/clipboard/clipboard.min.js"></script>
+
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="far fa-clone"></i>';
+    btn += '</span>'; 
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/cactus_blog/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Google Analytics -->
+
+<!-- Baidu Analytics -->
+
+<!-- Disqus Comments -->
+
+
+</body>
+</html>

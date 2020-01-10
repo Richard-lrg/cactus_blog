@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="一、@Enable*注解的工作原理  我们通过使用@Enable*来开启某一项功能的支持，从而避免配置大量增加，降低使用难度 通过观察源码，@Enable*注解都使用了@Import注解，@Import是用来导入配置类的，这就意味着@Enable*的实现是通过导入了一些自动配置的Bean来实现的   二、导入配置方式的三种类型1. 直接导入配置类如：@EnableScheduling 123456">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring高级话题-@Enable*注解的工作原理">
+<meta property="og:url" content="http://www.liruigao.top/cactus_blog/2020/01/10/Spring%E9%AB%98%E7%BA%A7%E8%AF%9D%E9%A2%98-Enable-%E6%B3%A8%E8%A7%A3%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/index.html">
+<meta property="og:site_name" content="瑞高的博客空间">
+<meta property="og:description" content="一、@Enable*注解的工作原理  我们通过使用@Enable*来开启某一项功能的支持，从而避免配置大量增加，降低使用难度 通过观察源码，@Enable*注解都使用了@Import注解，@Import是用来导入配置类的，这就意味着@Enable*的实现是通过导入了一些自动配置的Bean来实现的   二、导入配置方式的三种类型1. 直接导入配置类如：@EnableScheduling 123456">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2020-01-10T03:28:31.000Z">
+<meta property="article:modified_time" content="2020-01-10T03:33:42.052Z">
+<meta property="article:author" content="liruigao.top">
+<meta name="twitter:card" content="summary">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="/cactus_blog/images/favicon.ico">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="/cactus_blog/images/favicon-192x192.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="/cactus_blog/images/apple-touch-icon.png">
+          
+        
+    
+    <!-- title -->
+    <title>Spring高级话题-@Enable*注解的工作原理</title>
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/cactus_blog/css/style.css">
+
+    <!-- persian styles -->
+    
+      
+<link rel="stylesheet" href="/cactus_blog/css/rtl.css">
+
+    
+    <!-- rss -->
+    
+    
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="http://www.liruigao.top/index.html">主页</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/article.html">创作</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/photos.html">摄影</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/blog.html">博客</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/about.html">关于我</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/contact.html">联系我</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" href="/cactus_blog/2020/01/10/Spring%E9%AB%98%E7%BA%A7%E8%AF%9D%E9%A2%98-%E6%B5%8B%E8%AF%95/"><i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" href="/cactus_blog/2020/01/10/Spring%E9%AB%98%E7%BA%A7%E8%AF%9D%E9%A2%98-%E5%85%83%E6%B3%A8%E8%A7%A3%E4%B8%8E%E7%BB%84%E5%90%88%E6%B3%A8%E8%A7%A3/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://www.liruigao.top/cactus_blog/2020/01/10/Spring%E9%AB%98%E7%BA%A7%E8%AF%9D%E9%A2%98-Enable-%E6%B3%A8%E8%A7%A3%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/" target="_blank" rel="noopener"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://www.liruigao.top/cactus_blog/2020/01/10/Spring%E9%AB%98%E7%BA%A7%E8%AF%9D%E9%A2%98-Enable-%E6%B3%A8%E8%A7%A3%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/&text=Spring高级话题-@Enable*注解的工作原理" target="_blank" rel="noopener"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://www.liruigao.top/cactus_blog/2020/01/10/Spring%E9%AB%98%E7%BA%A7%E8%AF%9D%E9%A2%98-Enable-%E6%B3%A8%E8%A7%A3%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/&title=Spring高级话题-@Enable*注解的工作原理" target="_blank" rel="noopener"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://www.liruigao.top/cactus_blog/2020/01/10/Spring%E9%AB%98%E7%BA%A7%E8%AF%9D%E9%A2%98-Enable-%E6%B3%A8%E8%A7%A3%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/&is_video=false&description=Spring高级话题-@Enable*注解的工作原理" target="_blank" rel="noopener"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Spring高级话题-@Enable*注解的工作原理&body=Check out this article: http://www.liruigao.top/cactus_blog/2020/01/10/Spring%E9%AB%98%E7%BA%A7%E8%AF%9D%E9%A2%98-Enable-%E6%B3%A8%E8%A7%A3%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://www.liruigao.top/cactus_blog/2020/01/10/Spring%E9%AB%98%E7%BA%A7%E8%AF%9D%E9%A2%98-Enable-%E6%B3%A8%E8%A7%A3%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/&title=Spring高级话题-@Enable*注解的工作原理" target="_blank" rel="noopener"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://www.liruigao.top/cactus_blog/2020/01/10/Spring%E9%AB%98%E7%BA%A7%E8%AF%9D%E9%A2%98-Enable-%E6%B3%A8%E8%A7%A3%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/&title=Spring高级话题-@Enable*注解的工作原理" target="_blank" rel="noopener"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://www.liruigao.top/cactus_blog/2020/01/10/Spring%E9%AB%98%E7%BA%A7%E8%AF%9D%E9%A2%98-Enable-%E6%B3%A8%E8%A7%A3%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/&title=Spring高级话题-@Enable*注解的工作原理" target="_blank" rel="noopener"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://www.liruigao.top/cactus_blog/2020/01/10/Spring%E9%AB%98%E7%BA%A7%E8%AF%9D%E9%A2%98-Enable-%E6%B3%A8%E8%A7%A3%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/&title=Spring高级话题-@Enable*注解的工作原理" target="_blank" rel="noopener"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://www.liruigao.top/cactus_blog/2020/01/10/Spring%E9%AB%98%E7%BA%A7%E8%AF%9D%E9%A2%98-Enable-%E6%B3%A8%E8%A7%A3%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/&name=Spring高级话题-@Enable*注解的工作原理&description=" target="_blank" rel="noopener"><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://news.ycombinator.com/submitlink?u=http://www.liruigao.top/cactus_blog/2020/01/10/Spring%E9%AB%98%E7%BA%A7%E8%AF%9D%E9%A2%98-Enable-%E6%B3%A8%E8%A7%A3%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/&t=Spring高级话题-@Enable*注解的工作原理" target="_blank" rel="noopener"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#一、-Enable-注解的工作原理"><span class="toc-number">1.</span> <span class="toc-text">一、@Enable*注解的工作原理</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#二、导入配置方式的三种类型"><span class="toc-number">2.</span> <span class="toc-text">二、导入配置方式的三种类型</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-直接导入配置类"><span class="toc-number">2.1.</span> <span class="toc-text">1. 直接导入配置类</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-依据条件选择配置类"><span class="toc-number">2.2.</span> <span class="toc-text">2.依据条件选择配置类</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-动态注册Bean"><span class="toc-number">2.3.</span> <span class="toc-text">3.动态注册Bean</span></a></li></ol></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        Spring高级话题-@Enable*注解的工作原理
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">瑞高的博客空间</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2020-01-10T03:28:31.000Z" itemprop="datePublished">2020-01-10</time>
+        
+      
+    </div>
+
+
+      
+
+      
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <h4 id="一、-Enable-注解的工作原理"><a href="#一、-Enable-注解的工作原理" class="headerlink" title="一、@Enable*注解的工作原理"></a>一、@Enable*注解的工作原理</h4><blockquote>
+<ul>
+<li>我们通过使用@Enable*来开启某一项功能的支持，从而避免配置大量增加，降低使用难度</li>
+<li>通过观察源码，@Enable*注解都使用了@Import注解，@Import是用来导入配置类的，这就意味着@Enable*的实现是通过导入了一些自动配置的Bean来实现的</li>
+</ul>
+</blockquote>
+<h4 id="二、导入配置方式的三种类型"><a href="#二、导入配置方式的三种类型" class="headerlink" title="二、导入配置方式的三种类型"></a>二、导入配置方式的三种类型</h4><h5 id="1-直接导入配置类"><a href="#1-直接导入配置类" class="headerlink" title="1. 直接导入配置类"></a>1. 直接导入配置类</h5><p><strong>如：@EnableScheduling</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Target</span>(ElementType.TYPE)</span><br><span class="line"><span class="meta">@Retention</span>(RetentionPolicy.RUNTIME)</span><br><span class="line"><span class="meta">@Import</span>(SchedulingConfiguration<span class="class">.<span class="keyword">class</span>)</span></span><br><span class="line"><span class="class">@<span class="title">Documented</span></span></span><br><span class="line"><span class="class"><span class="title">public</span> @<span class="title">interface</span> <span class="title">EnableScheduling</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="meta">@Role</span>(BeanDefinition.ROLE_INFRASTRUCTURE)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SchedulingConfiguration</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="meta">@Bean</span>(name = TaskManagementConfigUtils.SCHEDULED_ANNOTATION_PROCESSOR_BEAN_NAME)</span><br><span class="line">	<span class="meta">@Role</span>(BeanDefinition.ROLE_INFRASTRUCTURE)</span><br><span class="line">	<span class="function"><span class="keyword">public</span> ScheduledAnnotationBeanPostProcessor <span class="title">scheduledAnnotationProcessor</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">new</span> ScheduledAnnotationBeanPostProcessor();</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="2-依据条件选择配置类"><a href="#2-依据条件选择配置类" class="headerlink" title="2.依据条件选择配置类"></a>2.依据条件选择配置类</h5><p><strong>如：@EnableAsync</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Target</span>(ElementType.TYPE)</span><br><span class="line"><span class="meta">@Retention</span>(RetentionPolicy.RUNTIME)</span><br><span class="line"><span class="meta">@Documented</span></span><br><span class="line"><span class="meta">@Import</span>(AsyncConfigurationSelector<span class="class">.<span class="keyword">class</span>)</span></span><br><span class="line"><span class="class"><span class="title">public</span> @<span class="title">interface</span> <span class="title">EnableAsync</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * Indicate the 'async' annotation type to be detected at either class</span></span><br><span class="line"><span class="comment">	 * or method level.</span></span><br><span class="line"><span class="comment">	 * &lt;p&gt;By default, both Spring's @&#123;<span class="doctag">@link</span> Async&#125; annotation and the EJB 3.1</span></span><br><span class="line"><span class="comment">	 * &#123;<span class="doctag">@code</span> <span class="doctag">@javax</span>.ejb.Asynchronous&#125; annotation will be detected.</span></span><br><span class="line"><span class="comment">	 * &lt;p&gt;This attribute exists so that developers can provide their own</span></span><br><span class="line"><span class="comment">	 * custom annotation type to indicate that a method (or all methods of</span></span><br><span class="line"><span class="comment">	 * a given class) should be invoked asynchronously.</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	Class&lt;? extends Annotation&gt; annotation() <span class="keyword">default</span> Annotation<span class="class">.<span class="keyword">class</span></span>;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * Indicate whether subclass-based (CGLIB) proxies are to be created as opposed</span></span><br><span class="line"><span class="comment">	 * to standard Java interface-based proxies.</span></span><br><span class="line"><span class="comment">	 * &lt;p&gt;&lt;strong&gt;Applicable only if the &#123;<span class="doctag">@link</span> #mode&#125; is set to &#123;<span class="doctag">@link</span> AdviceMode#PROXY&#125;&lt;/strong&gt;.</span></span><br><span class="line"><span class="comment">	 * &lt;p&gt;The default is &#123;<span class="doctag">@code</span> false&#125;.</span></span><br><span class="line"><span class="comment">	 * &lt;p&gt;Note that setting this attribute to &#123;<span class="doctag">@code</span> true&#125; will affect &lt;em&gt;all&lt;/em&gt;</span></span><br><span class="line"><span class="comment">	 * Spring-managed beans requiring proxying, not just those marked with &#123;<span class="doctag">@code</span> <span class="doctag">@Async</span>&#125;.</span></span><br><span class="line"><span class="comment">	 * For example, other beans marked with Spring's &#123;<span class="doctag">@code</span> <span class="doctag">@Transactional</span>&#125; annotation</span></span><br><span class="line"><span class="comment">	 * will be upgraded to subclass proxying at the same time. This approach has no</span></span><br><span class="line"><span class="comment">	 * negative impact in practice unless one is explicitly expecting one type of proxy</span></span><br><span class="line"><span class="comment">	 * vs. another &amp;mdash; for example, in tests.</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="function"><span class="keyword">boolean</span> <span class="title">proxyTargetClass</span><span class="params">()</span> <span class="keyword">default</span> <span class="keyword">false</span></span>;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * Indicate how async advice should be applied.</span></span><br><span class="line"><span class="comment">	 * &lt;p&gt;&lt;b&gt;The default is &#123;<span class="doctag">@link</span> AdviceMode#PROXY&#125;.&lt;/b&gt;</span></span><br><span class="line"><span class="comment">	 * Please note that proxy mode allows for interception of calls through the proxy</span></span><br><span class="line"><span class="comment">	 * only. Local calls within the same class cannot get intercepted that way; an</span></span><br><span class="line"><span class="comment">	 * &#123;<span class="doctag">@link</span> Async&#125; annotation on such a method within a local call will be ignored</span></span><br><span class="line"><span class="comment">	 * since Spring's interceptor does not even kick in for such a runtime scenario.</span></span><br><span class="line"><span class="comment">	 * For a more advanced mode of interception, consider switching this to</span></span><br><span class="line"><span class="comment">	 * &#123;<span class="doctag">@link</span> AdviceMode#ASPECTJ&#125;.</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="function">AdviceMode <span class="title">mode</span><span class="params">()</span> <span class="keyword">default</span> AdviceMode.PROXY</span>;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * Indicate the order in which the &#123;<span class="doctag">@link</span> AsyncAnnotationBeanPostProcessor&#125;</span></span><br><span class="line"><span class="comment">	 * should be applied.</span></span><br><span class="line"><span class="comment">	 * &lt;p&gt;The default is &#123;<span class="doctag">@link</span> Ordered#LOWEST_PRECEDENCE&#125; in order to run</span></span><br><span class="line"><span class="comment">	 * after all other post-processors, so that it can add an advisor to</span></span><br><span class="line"><span class="comment">	 * existing proxies rather than double-proxy.</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="function"><span class="keyword">int</span> <span class="title">order</span><span class="params">()</span> <span class="keyword">default</span> Ordered.LOWEST_PRECEDENCE</span>;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AsyncConfigurationSelector</span> <span class="keyword">extends</span> <span class="title">AdviceModeImportSelector</span>&lt;<span class="title">EnableAsync</span>&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String ASYNC_EXECUTION_ASPECT_CONFIGURATION_CLASS_NAME =</span><br><span class="line">			<span class="string">"org.springframework.scheduling.aspectj.AspectJAsyncConfiguration"</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * Returns &#123;<span class="doctag">@link</span> ProxyAsyncConfiguration&#125; or &#123;<span class="doctag">@code</span> AspectJAsyncConfiguration&#125;</span></span><br><span class="line"><span class="comment">	 * for &#123;<span class="doctag">@code</span> PROXY&#125; and &#123;<span class="doctag">@code</span> ASPECTJ&#125; values of &#123;<span class="doctag">@link</span> EnableAsync#mode()&#125;,</span></span><br><span class="line"><span class="comment">	 * respectively.</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="meta">@Nullable</span></span><br><span class="line">	<span class="keyword">public</span> String[] selectImports(AdviceMode adviceMode) &#123;</span><br><span class="line">		<span class="keyword">switch</span> (adviceMode) &#123;</span><br><span class="line">			<span class="keyword">case</span> PROXY:</span><br><span class="line">				<span class="keyword">return</span> <span class="keyword">new</span> String[] &#123;ProxyAsyncConfiguration<span class="class">.<span class="keyword">class</span>.<span class="title">getName</span>()&#125;</span>;</span><br><span class="line">			<span class="keyword">case</span> ASPECTJ:</span><br><span class="line">				<span class="keyword">return</span> <span class="keyword">new</span> String[] &#123;ASYNC_EXECUTION_ASPECT_CONFIGURATION_CLASS_NAME&#125;;</span><br><span class="line">			<span class="keyword">default</span>:</span><br><span class="line">				<span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="3-动态注册Bean"><a href="#3-动态注册Bean" class="headerlink" title="3.动态注册Bean"></a>3.动态注册Bean</h5><p><strong>如：@EnableAspectJAutoProxy</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Target</span>(ElementType.TYPE)</span><br><span class="line"><span class="meta">@Retention</span>(RetentionPolicy.RUNTIME)</span><br><span class="line"><span class="meta">@Documented</span></span><br><span class="line"><span class="meta">@Import</span>(AspectJAutoProxyRegistrar<span class="class">.<span class="keyword">class</span>)</span></span><br><span class="line"><span class="class"><span class="title">public</span> @<span class="title">interface</span> <span class="title">EnableAspectJAutoProxy</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * Indicate whether subclass-based (CGLIB) proxies are to be created as opposed</span></span><br><span class="line"><span class="comment">	 * to standard Java interface-based proxies. The default is &#123;<span class="doctag">@code</span> false&#125;.</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="function"><span class="keyword">boolean</span> <span class="title">proxyTargetClass</span><span class="params">()</span> <span class="keyword">default</span> <span class="keyword">false</span></span>;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * Indicate that the proxy should be exposed by the AOP framework as a &#123;<span class="doctag">@code</span> ThreadLocal&#125;</span></span><br><span class="line"><span class="comment">	 * for retrieval via the &#123;<span class="doctag">@link</span> org.springframework.aop.framework.AopContext&#125; class.</span></span><br><span class="line"><span class="comment">	 * Off by default, i.e. no guarantees that &#123;<span class="doctag">@code</span> AopContext&#125; access will work.</span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@since</span> 4.3.1</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="function"><span class="keyword">boolean</span> <span class="title">exposeProxy</span><span class="params">()</span> <span class="keyword">default</span> <span class="keyword">false</span></span>;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">AspectJAutoProxyRegistrar</span> <span class="keyword">implements</span> <span class="title">ImportBeanDefinitionRegistrar</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * Register, escalate, and configure the AspectJ auto proxy creator based on the value</span></span><br><span class="line"><span class="comment">	 * of the @&#123;<span class="doctag">@link</span> EnableAspectJAutoProxy#proxyTargetClass()&#125; attribute on the importing</span></span><br><span class="line"><span class="comment">	 * &#123;<span class="doctag">@code</span> <span class="doctag">@Configuration</span>&#125; class.</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">registerBeanDefinitions</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">			AnnotationMetadata importingClassMetadata, BeanDefinitionRegistry registry)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">		AopConfigUtils.registerAspectJAnnotationAutoProxyCreatorIfNecessary(registry);</span><br><span class="line"></span><br><span class="line">		AnnotationAttributes enableAspectJAutoProxy =</span><br><span class="line">				AnnotationConfigUtils.attributesFor(importingClassMetadata, EnableAspectJAutoProxy<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">		<span class="keyword">if</span> (enableAspectJAutoProxy != <span class="keyword">null</span>) &#123;</span><br><span class="line">			<span class="keyword">if</span> (enableAspectJAutoProxy.getBoolean(<span class="string">"proxyTargetClass"</span>)) &#123;</span><br><span class="line">				AopConfigUtils.forceAutoProxyCreatorToUseClassProxying(registry);</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">if</span> (enableAspectJAutoProxy.getBoolean(<span class="string">"exposeProxy"</span>)) &#123;</span><br><span class="line">				AopConfigUtils.forceAutoProxyCreatorToExposeProxy(registry);</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="http://www.liruigao.top/index.html">主页</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/article.html">创作</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/photos.html">摄影</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/blog.html">博客</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/about.html">关于我</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/contact.html">联系我</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#一、-Enable-注解的工作原理"><span class="toc-number">1.</span> <span class="toc-text">一、@Enable*注解的工作原理</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#二、导入配置方式的三种类型"><span class="toc-number">2.</span> <span class="toc-text">二、导入配置方式的三种类型</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-直接导入配置类"><span class="toc-number">2.1.</span> <span class="toc-text">1. 直接导入配置类</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-依据条件选择配置类"><span class="toc-number">2.2.</span> <span class="toc-text">2.依据条件选择配置类</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-动态注册Bean"><span class="toc-number">2.3.</span> <span class="toc-text">3.动态注册Bean</span></a></li></ol></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://www.liruigao.top/cactus_blog/2020/01/10/Spring%E9%AB%98%E7%BA%A7%E8%AF%9D%E9%A2%98-Enable-%E6%B3%A8%E8%A7%A3%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/" target="_blank" rel="noopener"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://www.liruigao.top/cactus_blog/2020/01/10/Spring%E9%AB%98%E7%BA%A7%E8%AF%9D%E9%A2%98-Enable-%E6%B3%A8%E8%A7%A3%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/&text=Spring高级话题-@Enable*注解的工作原理" target="_blank" rel="noopener"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://www.liruigao.top/cactus_blog/2020/01/10/Spring%E9%AB%98%E7%BA%A7%E8%AF%9D%E9%A2%98-Enable-%E6%B3%A8%E8%A7%A3%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/&title=Spring高级话题-@Enable*注解的工作原理" target="_blank" rel="noopener"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://www.liruigao.top/cactus_blog/2020/01/10/Spring%E9%AB%98%E7%BA%A7%E8%AF%9D%E9%A2%98-Enable-%E6%B3%A8%E8%A7%A3%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/&is_video=false&description=Spring高级话题-@Enable*注解的工作原理" target="_blank" rel="noopener"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Spring高级话题-@Enable*注解的工作原理&body=Check out this article: http://www.liruigao.top/cactus_blog/2020/01/10/Spring%E9%AB%98%E7%BA%A7%E8%AF%9D%E9%A2%98-Enable-%E6%B3%A8%E8%A7%A3%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://www.liruigao.top/cactus_blog/2020/01/10/Spring%E9%AB%98%E7%BA%A7%E8%AF%9D%E9%A2%98-Enable-%E6%B3%A8%E8%A7%A3%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/&title=Spring高级话题-@Enable*注解的工作原理" target="_blank" rel="noopener"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://www.liruigao.top/cactus_blog/2020/01/10/Spring%E9%AB%98%E7%BA%A7%E8%AF%9D%E9%A2%98-Enable-%E6%B3%A8%E8%A7%A3%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/&title=Spring高级话题-@Enable*注解的工作原理" target="_blank" rel="noopener"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://www.liruigao.top/cactus_blog/2020/01/10/Spring%E9%AB%98%E7%BA%A7%E8%AF%9D%E9%A2%98-Enable-%E6%B3%A8%E8%A7%A3%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/&title=Spring高级话题-@Enable*注解的工作原理" target="_blank" rel="noopener"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://www.liruigao.top/cactus_blog/2020/01/10/Spring%E9%AB%98%E7%BA%A7%E8%AF%9D%E9%A2%98-Enable-%E6%B3%A8%E8%A7%A3%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/&title=Spring高级话题-@Enable*注解的工作原理" target="_blank" rel="noopener"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://www.liruigao.top/cactus_blog/2020/01/10/Spring%E9%AB%98%E7%BA%A7%E8%AF%9D%E9%A2%98-Enable-%E6%B3%A8%E8%A7%A3%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/&name=Spring高级话题-@Enable*注解的工作原理&description=" target="_blank" rel="noopener"><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://news.ycombinator.com/submitlink?u=http://www.liruigao.top/cactus_blog/2020/01/10/Spring%E9%AB%98%E7%BA%A7%E8%AF%9D%E9%A2%98-Enable-%E6%B3%A8%E8%A7%A3%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/&t=Spring高级话题-@Enable*注解的工作原理" target="_blank" rel="noopener"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2020 liruigao.top
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="http://www.liruigao.top/index.html">主页</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/article.html">创作</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/photos.html">摄影</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/blog.html">博客</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/about.html">关于我</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/contact.html">联系我</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+<link rel="stylesheet" href="/cactus_blog/lib/font-awesome/css/all.min.css">
+
+
+<link rel="stylesheet" href="/cactus_blog/lib/justified-gallery/css/justifiedGallery.min.css">
+
+
+    <!-- jquery -->
+
+<script src="/cactus_blog/lib/jquery/jquery.min.js"></script>
+
+
+<script src="/cactus_blog/lib/justified-gallery/js/jquery.justifiedGallery.min.js"></script>
+
+<!-- clipboard -->
+
+  
+<script src="/cactus_blog/lib/clipboard/clipboard.min.js"></script>
+
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="far fa-clone"></i>';
+    btn += '</span>'; 
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/cactus_blog/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Google Analytics -->
+
+<!-- Baidu Analytics -->
+
+<!-- Disqus Comments -->
+
+
+</body>
+</html>

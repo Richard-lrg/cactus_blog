@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="Spring框架的四大原则：  使用POJO进行轻量级和最小侵入式开发 通过依赖注入和基于接口编程实现松耦合 通过AOP和默认习惯进行声明式编程 使用AOP和模板（template）减少模式化代码   对四大原则的理解可以看这里 一、依赖注入1.依赖注入的概念： 依赖注入是指容器负责创建对象和维护对象间的依赖关系，而非通过对象本身负责自己的创建和解决自己的依赖。  2.依赖注入的主要目的： 主要">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring基础配置">
+<meta property="og:url" content="http://www.liruigao.top/cactus_blog/2020/01/10/Spring%E5%9F%BA%E7%A1%80%E9%85%8D%E7%BD%AE/index.html">
+<meta property="og:site_name" content="瑞高的博客空间">
+<meta property="og:description" content="Spring框架的四大原则：  使用POJO进行轻量级和最小侵入式开发 通过依赖注入和基于接口编程实现松耦合 通过AOP和默认习惯进行声明式编程 使用AOP和模板（template）减少模式化代码   对四大原则的理解可以看这里 一、依赖注入1.依赖注入的概念： 依赖注入是指容器负责创建对象和维护对象间的依赖关系，而非通过对象本身负责自己的创建和解决自己的依赖。  2.依赖注入的主要目的： 主要">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/2019101116211179.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0NhY3R1c19Mcmc=,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20191011162129763.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0NhY3R1c19Mcmc=,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20191011162149201.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0NhY3R1c19Mcmc=,size_16,color_FFFFFF,t_70">
+<meta property="article:published_time" content="2020-01-10T03:19:27.000Z">
+<meta property="article:modified_time" content="2020-01-10T03:33:42.052Z">
+<meta property="article:author" content="liruigao.top">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/2019101116211179.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0NhY3R1c19Mcmc=,size_16,color_FFFFFF,t_70">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="/cactus_blog/images/favicon.ico">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="/cactus_blog/images/favicon-192x192.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="/cactus_blog/images/apple-touch-icon.png">
+          
+        
+    
+    <!-- title -->
+    <title>Spring基础配置</title>
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/cactus_blog/css/style.css">
+
+    <!-- persian styles -->
+    
+      
+<link rel="stylesheet" href="/cactus_blog/css/rtl.css">
+
+    
+    <!-- rss -->
+    
+    
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="http://www.liruigao.top/index.html">主页</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/article.html">创作</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/photos.html">摄影</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/blog.html">博客</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/about.html">关于我</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/contact.html">联系我</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" href="/cactus_blog/2020/01/10/Spring%E5%B8%B8%E7%94%A8%E9%85%8D%E7%BD%AE-Bean%E7%9A%84Scope/"><i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" href="/cactus_blog/2020/01/10/Spring%E9%A1%B9%E7%9B%AE%E5%BF%AB%E9%80%9F%E6%90%AD%E5%BB%BA/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://www.liruigao.top/cactus_blog/2020/01/10/Spring%E5%9F%BA%E7%A1%80%E9%85%8D%E7%BD%AE/" target="_blank" rel="noopener"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://www.liruigao.top/cactus_blog/2020/01/10/Spring%E5%9F%BA%E7%A1%80%E9%85%8D%E7%BD%AE/&text=Spring基础配置" target="_blank" rel="noopener"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://www.liruigao.top/cactus_blog/2020/01/10/Spring%E5%9F%BA%E7%A1%80%E9%85%8D%E7%BD%AE/&title=Spring基础配置" target="_blank" rel="noopener"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://www.liruigao.top/cactus_blog/2020/01/10/Spring%E5%9F%BA%E7%A1%80%E9%85%8D%E7%BD%AE/&is_video=false&description=Spring基础配置" target="_blank" rel="noopener"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Spring基础配置&body=Check out this article: http://www.liruigao.top/cactus_blog/2020/01/10/Spring%E5%9F%BA%E7%A1%80%E9%85%8D%E7%BD%AE/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://www.liruigao.top/cactus_blog/2020/01/10/Spring%E5%9F%BA%E7%A1%80%E9%85%8D%E7%BD%AE/&title=Spring基础配置" target="_blank" rel="noopener"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://www.liruigao.top/cactus_blog/2020/01/10/Spring%E5%9F%BA%E7%A1%80%E9%85%8D%E7%BD%AE/&title=Spring基础配置" target="_blank" rel="noopener"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://www.liruigao.top/cactus_blog/2020/01/10/Spring%E5%9F%BA%E7%A1%80%E9%85%8D%E7%BD%AE/&title=Spring基础配置" target="_blank" rel="noopener"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://www.liruigao.top/cactus_blog/2020/01/10/Spring%E5%9F%BA%E7%A1%80%E9%85%8D%E7%BD%AE/&title=Spring基础配置" target="_blank" rel="noopener"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://www.liruigao.top/cactus_blog/2020/01/10/Spring%E5%9F%BA%E7%A1%80%E9%85%8D%E7%BD%AE/&name=Spring基础配置&description=" target="_blank" rel="noopener"><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://news.ycombinator.com/submitlink?u=http://www.liruigao.top/cactus_blog/2020/01/10/Spring%E5%9F%BA%E7%A1%80%E9%85%8D%E7%BD%AE/&t=Spring基础配置" target="_blank" rel="noopener"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#一、依赖注入"><span class="toc-number">1.</span> <span class="toc-text">一、依赖注入</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-依赖注入的概念："><span class="toc-number">1.1.</span> <span class="toc-text">1.依赖注入的概念：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-依赖注入的主要目的："><span class="toc-number">1.2.</span> <span class="toc-text">2.依赖注入的主要目的：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-具体实现"><span class="toc-number">1.3.</span> <span class="toc-text">3.具体实现</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#4-涉及到的注解（推荐注解的方式，xml效率低且复杂）"><span class="toc-number">1.4.</span> <span class="toc-text">4.涉及到的注解（推荐注解的方式，xml效率低且复杂）</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#5-Ioc-amp-Di-Demo"><span class="toc-number">1.5.</span> <span class="toc-text">5.Ioc&amp;Di Demo</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#二、Java配置"><span class="toc-number">2.</span> <span class="toc-text">二、Java配置</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-Java配置简介"><span class="toc-number">2.1.</span> <span class="toc-text">1.Java配置简介</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-什么时候使用Java配置"><span class="toc-number">2.2.</span> <span class="toc-text">2.什么时候使用Java配置</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-JavaConfig-demo"><span class="toc-number">2.3.</span> <span class="toc-text">3.JavaConfig demo</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#三、AOP"><span class="toc-number">3.</span> <span class="toc-text">三、AOP</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-AOP的由来"><span class="toc-number">3.1.</span> <span class="toc-text">1.AOP的由来</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-AOP的目的"><span class="toc-number">3.2.</span> <span class="toc-text">2.AOP的目的</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-涉及到的注解"><span class="toc-number">3.3.</span> <span class="toc-text">3.涉及到的注解</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#4-AOP-Demo"><span class="toc-number">3.4.</span> <span class="toc-text">4.AOP Demo</span></a></li></ol></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        Spring基础配置
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">瑞高的博客空间</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2020-01-10T03:19:27.000Z" itemprop="datePublished">2020-01-10</time>
+        
+      
+    </div>
+
+
+      
+
+      
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <blockquote>
+<p>Spring框架的四大原则：</p>
+<ol>
+<li>使用POJO进行轻量级和最小侵入式开发</li>
+<li>通过依赖注入和基于接口编程实现松耦合</li>
+<li>通过AOP和默认习惯进行声明式编程</li>
+<li>使用AOP和模板（template）减少模式化代码</li>
+</ol>
+</blockquote>
+<p><a href="http://www.west999.com/info/html/chengxusheji/Javajishu/20180719/4347703.html" target="_blank" rel="noopener">对四大原则的理解可以看这里</a></p>
+<h4 id="一、依赖注入"><a href="#一、依赖注入" class="headerlink" title="一、依赖注入"></a>一、依赖注入</h4><h5 id="1-依赖注入的概念："><a href="#1-依赖注入的概念：" class="headerlink" title="1.依赖注入的概念："></a>1.依赖注入的概念：</h5><blockquote>
+<p>依赖注入是指容器负责创建对象和维护对象间的依赖关系，而非通过对象本身负责自己的创建和解决自己的依赖。</p>
+</blockquote>
+<h5 id="2-依赖注入的主要目的："><a href="#2-依赖注入的主要目的：" class="headerlink" title="2.依赖注入的主要目的："></a>2.依赖注入的主要目的：</h5><blockquote>
+<p>主要目的就是解耦，所体现的是java组合的理念。毫无疑问组合相对于继承，耦合度会大大降低。</p>
+</blockquote>
+<h5 id="3-具体实现"><a href="#3-具体实现" class="headerlink" title="3.具体实现"></a>3.具体实现</h5><blockquote>
+<p>Spring IoC容器（ApplicationContext）负责创建Bean，并通过容器将功能类Bean注入到你所需要的Bean中。<br>Spring提供xml、注解、Java配置，这三种方式都被称为配置元数据。即描述数据的数据，本身不具备任何执行能力，只能通过外界代码对元数据解析后进行一些有意义的操作。</p>
+</blockquote>
+<h5 id="4-涉及到的注解（推荐注解的方式，xml效率低且复杂）"><a href="#4-涉及到的注解（推荐注解的方式，xml效率低且复杂）" class="headerlink" title="4.涉及到的注解（推荐注解的方式，xml效率低且复杂）"></a>4.涉及到的注解（推荐注解的方式，xml效率低且复杂）</h5><p><strong>声明式Bean的注解：</strong></p>
+<ul>
+<li>@Component   没有明确角色</li>
+<li>@Service     业务逻辑层使用</li>
+<li>@Repository  数据访问层使用</li>
+<li>@Controller  展现层使用（提供接口的方法类） </li>
+</ul>
+<p><strong>注入Bean的注解</strong></p>
+<ul>
+<li>@Autowired    Spring提供的注解（通常使用这个）</li>
+<li>@Inject       JSR-330提供的注解</li>
+<li>@Resource     JSR-250提供的注解<br>（注入Bean的注解 可注解到set方法上或者属性上，具体根据实际开发场景选择）</li>
+</ul>
+<h5 id="5-Ioc-amp-Di-Demo"><a href="#5-Ioc-amp-Di-Demo" class="headerlink" title="5.Ioc&amp;Di Demo"></a>5.Ioc&amp;Di Demo</h5><p><strong>方法bean1</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.cactus.iocdidemo;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Service;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Created by liruigao</span></span><br><span class="line"><span class="comment"> * Date: 2019-10-11 11:02</span></span><br><span class="line"><span class="comment"> * Description:</span></span><br><span class="line"><span class="comment"> * 1. <span class="doctag">@Service</span> 声明FuncOneService为bean</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="meta">@Service</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">FuncOneService</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">show</span><span class="params">(String word)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"Function one show : "</span> + word;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>方法bean2</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.cactus.iocdidemo;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.beans.factory.annotation.Autowired;</span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Service;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Created by liruigao</span></span><br><span class="line"><span class="comment"> * Date: 2019-10-11 11:03</span></span><br><span class="line"><span class="comment"> * Description:</span></span><br><span class="line"><span class="comment"> * 1. <span class="doctag">@Service</span> 声明 FuncTwoService 为bean</span></span><br><span class="line"><span class="comment"> * 2. <span class="doctag">@Autowired</span> 将 FuncOneService 注入到 FuncTwoService</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="meta">@Service</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">FuncTwoService</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> FuncOneService funcOneService;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">show</span><span class="params">(String word)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> funcOneService.show(word);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>配置类</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.cactus.iocdidemo;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.context.annotation.ComponentScan;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.annotation.Configuration;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Created by liruigao</span></span><br><span class="line"><span class="comment"> * Date: 2019-10-11 11:07</span></span><br><span class="line"><span class="comment"> * Description:</span></span><br><span class="line"><span class="comment"> * 1. <span class="doctag">@Configuration</span> 声明注册类</span></span><br><span class="line"><span class="comment"> * 2. <span class="doctag">@ComponentScan</span>扫描指定包，并注册为Bean</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="meta">@ComponentScan</span>(<span class="string">"com.cactus.iocdidemo"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BeanConfig</span> </span>&#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>Main</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.cactus.iocdidemo;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.context.annotation.AnnotationConfigApplicationContext;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Created by liruigao</span></span><br><span class="line"><span class="comment"> * Date: 2019-10-11 11:05</span></span><br><span class="line"><span class="comment"> * Description:</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 使用AnnotationConfigApplicationContext容器，并选择BeanConfig为配置类</span></span><br><span class="line">        AnnotationConfigApplicationContext context = <span class="keyword">new</span> AnnotationConfigApplicationContext(BeanConfig<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// bean已有容器创建，从容器中获取方法bean</span></span><br><span class="line">        FuncTwoService funcTwoService = context.getBean(FuncTwoService<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line"></span><br><span class="line">        String showWord = funcTwoService.show(<span class="string">"hi ioc&amp;di"</span>);</span><br><span class="line">        System.out.println(showWord);</span><br><span class="line">        </span><br><span class="line">        context.close();</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>result：</strong><br><img src="https://img-blog.csdnimg.cn/2019101116211179.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0NhY3R1c19Mcmc=,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<h4 id="二、Java配置"><a href="#二、Java配置" class="headerlink" title="二、Java配置"></a>二、Java配置</h4><h5 id="1-Java配置简介"><a href="#1-Java配置简介" class="headerlink" title="1.Java配置简介"></a>1.Java配置简介</h5><blockquote>
+<p>Java配置是Spring 4.x和Spring Boot推荐的配置方式，可以完全替代xml配置。<br>通过@Configuration和@Bean来实现：</p>
+<ul>
+<li>@Configuration 声明当前类是个配置类，相当于一个xml文件</li>
+<li>@Bean         注解到方法上，声明当前方法返回值是个Bean</li>
+</ul>
+</blockquote>
+<h5 id="2-什么时候使用Java配置"><a href="#2-什么时候使用Java配置" class="headerlink" title="2.什么时候使用Java配置"></a>2.什么时候使用Java配置</h5><blockquote>
+<p>全局配置使用java配置，如数据库相关配置、MVC相关配置<br>业务Bean的配置使用注解配置，如@Service、@Component、@Repository、@Controller</p>
+</blockquote>
+<h5 id="3-JavaConfig-demo"><a href="#3-JavaConfig-demo" class="headerlink" title="3.JavaConfig demo"></a>3.JavaConfig demo</h5><p><strong>FuncOneService</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.cactus.javaconfigdemo;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Created by liruigao</span></span><br><span class="line"><span class="comment"> * Date: 2019-10-11 11:33</span></span><br><span class="line"><span class="comment"> * Description: 普通方法类，不声明为Bean</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">FuncOneService</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">show</span><span class="params">(String word)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"java config, Function one show : "</span> + word;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>FuncTwoService</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.cactus.javaconfigdemo;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Created by liruigao</span></span><br><span class="line"><span class="comment"> * Date: 2019-10-11 11:34</span></span><br><span class="line"><span class="comment"> * Description:普通方法类， 不声明为bean， 不依赖注入</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">FuncTwoService</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> FuncOneService funcOneService;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setFuncOneService</span><span class="params">(FuncOneService funcOneService)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.funcOneService = funcOneService;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">show</span><span class="params">(String word)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> funcOneService.show(word);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>JavaConfig</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.cactus.javaconfigdemo;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.context.annotation.Bean;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.annotation.ComponentScan;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.annotation.Configuration;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Created by liruigao</span></span><br><span class="line"><span class="comment"> * Date: 2019-10-11 11:36</span></span><br><span class="line"><span class="comment"> * Description:</span></span><br><span class="line"><span class="comment"> * 1. 声明为配置类</span></span><br><span class="line"><span class="comment"> * 2. 无需进行包扫描，因为所有的bean都在这里定义</span></span><br><span class="line"><span class="comment"> * 3. 通过使用<span class="doctag">@Bean</span>注解， 可以更加灵活地创建管理Bean</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">JavaConfig</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> FuncOneService <span class="title">funcOneService</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> FuncOneService();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> FuncTwoService <span class="title">funcTwoService</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        FuncTwoService funcTwoService = <span class="keyword">new</span> FuncTwoService();</span><br><span class="line">        funcTwoService.setFuncOneService(funcOneService());</span><br><span class="line">        <span class="keyword">return</span> funcTwoService;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>Main</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.cactus.javaconfigdemo;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.context.annotation.AnnotationConfigApplicationContext;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Created by liruigao</span></span><br><span class="line"><span class="comment"> * Date: 2019-10-11 11:43</span></span><br><span class="line"><span class="comment"> * Description:</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        AnnotationConfigApplicationContext context = <span class="keyword">new</span> AnnotationConfigApplicationContext(JavaConfig<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">        FuncTwoService funcTwoService = context.getBean(FuncTwoService<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line"></span><br><span class="line">        System.out.println(funcTwoService.show(<span class="string">"hi javaConfig"</span>));</span><br><span class="line"></span><br><span class="line">        context.close();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>result</strong><br><img src="https://img-blog.csdnimg.cn/20191011162129763.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0NhY3R1c19Mcmc=,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<h4 id="三、AOP"><a href="#三、AOP" class="headerlink" title="三、AOP"></a>三、AOP</h4><h5 id="1-AOP的由来"><a href="#1-AOP的由来" class="headerlink" title="1.AOP的由来"></a>1.AOP的由来</h5><blockquote>
+<p><strong>AOP: 面向切面编程</strong></p>
+</blockquote>
+<blockquote>
+<p>OOP引入封装、继承和多态性等概念来建立一种对象层次结构，用以模拟公共行为的一个集合。当我们需 要为分散的对象引入公共行为的时候，OOP则显得无能为力。也就是说，OOP允许你定义从上到下的关系，但并不适合定义从左到右的关系。<br>AOP技术利用一种称为“横切”的技术，剖解开封装的对象内部，并将那些影响了多个类的公共行为封装到一个可重用模块，并将其名为 “Aspect”，即方面。所谓“方面”，简单地说，就是将那些与业务无关，却为业务模块所共同调用的逻辑或责任封装起来，便于减少系统的重复代码，降低 模块间的耦合度，并有利于未来的可操作性和可维护性。<br>AOP代表的是一个横向的关系，如果说“对象”是一个空心的圆柱体，其中封装的是对象的属性和行为； 那么面向方面编程的方法，就仿佛一把利刃，将这些空心圆柱体剖开，以获得其内部的消息。而剖开的切面，也就是所谓的“方面”了。然后它又以巧夺天功的妙手 将这些剖开的切面复原，不留痕迹。</p>
+</blockquote>
+<h5 id="2-AOP的目的"><a href="#2-AOP的目的" class="headerlink" title="2.AOP的目的"></a>2.AOP的目的</h5><blockquote>
+<p>Spring AOP存在的目的就是为了解耦。 让一组类共享相同的行为</p>
+</blockquote>
+<h5 id="3-涉及到的注解"><a href="#3-涉及到的注解" class="headerlink" title="3.涉及到的注解"></a>3.涉及到的注解</h5><p><strong>切面编程涉及到的注解：</strong></p>
+<ul>
+<li>@Aspect 声明一个切面</li>
+<li>@PointCut 声明一个切点</li>
+<li>@Before, @After, @Around 定义建言， 可直接将切点（或者方法拦截规则）作为参数</li>
+</ul>
+<p><strong>创建一个注解所涉及到的注解：</strong></p>
+<ul>
+<li>@interface 声明一个注解</li>
+<li>@Target 用于描述注解的使用范围</li>
+<li>@Retention 用于描述一个注解存在的生命周期</li>
+</ul>
+<h5 id="4-AOP-Demo"><a href="#4-AOP-Demo" class="headerlink" title="4.AOP Demo"></a>4.AOP Demo</h5><p><strong>pom文件</strong></p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">project</span> <span class="attr">xmlns</span>=<span class="string">"http://maven.apache.org/POM/4.0.0"</span></span></span><br><span class="line"><span class="tag">         <span class="attr">xmlns:xsi</span>=<span class="string">"http://www.w3.org/2001/XMLSchema-instance"</span></span></span><br><span class="line"><span class="tag">         <span class="attr">xsi:schemaLocation</span>=<span class="string">"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">modelVersion</span>&gt;</span>4.0.0<span class="tag">&lt;/<span class="name">modelVersion</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.cactus<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>springdemo<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.0-SNAPSHOT<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></span><br><span class="line"><span class="comment">&lt;!--        Spring容器--&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-context<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>5.1.9.RELEASE<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"><span class="comment">&lt;!--        Aop--&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-aop<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>5.1.9.RELEASE<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"><span class="comment">&lt;!--        aspectj--&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.aspectj<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>aspectjrt<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.8.13<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.aspectj<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>aspectjweaver<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.8.13<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="name">project</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>拦截注解</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.cactus.aopdemo;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.lang.annotation.ElementType;</span><br><span class="line"><span class="keyword">import</span> java.lang.annotation.Retention;</span><br><span class="line"><span class="keyword">import</span> java.lang.annotation.RetentionPolicy;</span><br><span class="line"><span class="keyword">import</span> java.lang.annotation.Target;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Created by liruigao</span></span><br><span class="line"><span class="comment"> * Date: 2019-10-11 15:01</span></span><br><span class="line"><span class="comment"> * Description: 拦截规则的注解</span></span><br><span class="line"><span class="comment"> * 1. <span class="doctag">@Target</span></span></span><br><span class="line"><span class="comment"> * 用于描述注解的使用范围</span></span><br><span class="line"><span class="comment"> * ElementType枚举类型，元注解中的枚举值决定了一个注解可以标记的范围</span></span><br><span class="line"><span class="comment"> *      TYPE ： 类型上面  用于描述类、接口(包括注解类型) 或enum声明</span></span><br><span class="line"><span class="comment"> *      FIELD ： 用于描述字段</span></span><br><span class="line"><span class="comment"> *      METHOD ：方法</span></span><br><span class="line"><span class="comment"> *      PARAMETER ： 参数 【参数名】</span></span><br><span class="line"><span class="comment"> *      CONSTRUCTOR ： 构造方法</span></span><br><span class="line"><span class="comment"> *      LOCAL_VARIABLE ： 局部变量</span></span><br><span class="line"><span class="comment"> *      ANNOTATION_TYPE ： 可以打在注解上面</span></span><br><span class="line"><span class="comment"> *      PACKAGE ：可以打在包上面</span></span><br><span class="line"><span class="comment"> *      TYPE_PARAMETER ： 参数类型【形式参数类型】</span></span><br><span class="line"><span class="comment"> *2. <span class="doctag">@Retention</span></span></span><br><span class="line"><span class="comment"> * 用于描述一个注解存在的生命周期【源码，字节码文件，运行时】</span></span><br><span class="line"><span class="comment"> * 枚举值RetentionPolicy：几个值决定了几个状态：</span></span><br><span class="line"><span class="comment"> * 		SOURCE ：表示一个注解可以存在于源码中==&gt;java的源码中</span></span><br><span class="line"><span class="comment"> *      CLASS ：表示 一个注解可以在源码中，并且可以在字节码文件中</span></span><br><span class="line"><span class="comment"> *      RUNTIME ：表示 一个注解可以在源码、字节码、及运行时期该注解都会存在</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="meta">@Target</span>(ElementType.METHOD)</span><br><span class="line"><span class="meta">@Retention</span>(RetentionPolicy.RUNTIME)</span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> Action &#123;</span><br><span class="line">    <span class="function">String <span class="title">name</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>被拦截类1</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.cactus.aopdemo;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Service;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Created by liruigao</span></span><br><span class="line"><span class="comment"> * Date: 2019-10-11 15:16</span></span><br><span class="line"><span class="comment"> * Description:</span></span><br><span class="line"><span class="comment"> *  被拦截类，使用拦截注解</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="meta">@Service</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">FuncOneService</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Action</span>(name = <span class="string">"注解式拦截"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">show</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"function one show time!"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>被拦截类2</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.cactus.aopdemo;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Service;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Created by liruigao</span></span><br><span class="line"><span class="comment"> * Date: 2019-10-11 15:42</span></span><br><span class="line"><span class="comment"> * Description:</span></span><br><span class="line"><span class="comment"> * 被拦截类， 使用方法规则拦截</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="meta">@Service</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">FuncTwoService</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">show</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"this is func2 showtime"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"this is func2 showtime test"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>切面类</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.cactus.aopdemo;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.aspectj.lang.JoinPoint;</span><br><span class="line"><span class="keyword">import</span> org.aspectj.lang.annotation.After;</span><br><span class="line"><span class="keyword">import</span> org.aspectj.lang.annotation.Aspect;</span><br><span class="line"><span class="keyword">import</span> org.aspectj.lang.annotation.Before;</span><br><span class="line"><span class="keyword">import</span> org.aspectj.lang.annotation.Pointcut;</span><br><span class="line"><span class="keyword">import</span> org.aspectj.lang.reflect.MethodSignature;</span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Component;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.Method;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Created by liruigao</span></span><br><span class="line"><span class="comment"> * Date: 2019-10-11 15:19</span></span><br><span class="line"><span class="comment"> * Description: 切面类</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@Aspect</span> 声明切面</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@Component</span> 声明Bean</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@Pointcut</span> 声明切点</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@After</span> 声明一个建言，并使用<span class="doctag">@Pointcut</span>声明的切点。</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="meta">@Aspect</span></span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">FuncAspect</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 使用注解拦截-start</span></span><br><span class="line"></span><br><span class="line">    <span class="meta">@Pointcut</span>(<span class="string">"@annotation(com.cactus.aopdemo.Action)"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">annotationPointCut</span><span class="params">()</span></span>&#123;&#125;;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 可通过反射获得注解上的属性，然后做自定义操作</span></span><br><span class="line">    <span class="meta">@After</span>(<span class="string">"annotationPointCut()"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">after</span><span class="params">(JoinPoint joinPoint)</span> </span>&#123;</span><br><span class="line">        MethodSignature signature = (MethodSignature)joinPoint.getSignature();</span><br><span class="line">        Method method = signature.getMethod();</span><br><span class="line">        Action action = method.getAnnotation(Action<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">        System.out.println(<span class="string">"FuncAspect after, action name : "</span> + action.name());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Before</span>(<span class="string">"annotationPointCut()"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">before</span><span class="params">(JoinPoint joinPoint)</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"FuncAspect after, no operation, 注解式拦截"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 使用注解拦截-end</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 使用方法规则拦截-start</span></span><br><span class="line"></span><br><span class="line">    <span class="meta">@Before</span>(<span class="string">"execution(* com.cactus.aopdemo.FuncTwoService.*(..))"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">beforef</span><span class="params">(JoinPoint joinPoint)</span> </span>&#123;</span><br><span class="line">        MethodSignature signature = (MethodSignature)joinPoint.getSignature();</span><br><span class="line">        Method method = signature.getMethod();</span><br><span class="line">        System.out.println(<span class="string">"方法规则拦截-before， methodName:"</span> + method.getName());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@After</span>(<span class="string">"execution(* com.cactus.aopdemo.FuncTwoService.*(..))"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">afterf</span><span class="params">(JoinPoint joinPoint)</span> </span>&#123;</span><br><span class="line">        MethodSignature signature = (MethodSignature)joinPoint.getSignature();</span><br><span class="line">        Method method = signature.getMethod();</span><br><span class="line">        System.out.println(<span class="string">"方法规则拦截-after， methodName:"</span> + method.getName());</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 使用方法规则拦截-end</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>配置类</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.cactus.aopdemo;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.context.annotation.ComponentScan;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.annotation.Configuration;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.annotation.EnableAspectJAutoProxy;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Created by liruigao</span></span><br><span class="line"><span class="comment"> * Date: 2019-10-11 15:38</span></span><br><span class="line"><span class="comment"> * Description: AOP demo 配置类</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@EnableAspectJAutoProxy</span> 开启Spring对AspectJ的支持</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="meta">@ComponentScan</span>(<span class="string">"com.cactus.aopdemo"</span>)</span><br><span class="line"><span class="meta">@EnableAspectJAutoProxy</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AopConfig</span> </span>&#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>Main</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.cactus.aopdemo;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.context.annotation.AnnotationConfigApplicationContext;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Created by liruigao</span></span><br><span class="line"><span class="comment"> * Date: 2019-10-11 15:37</span></span><br><span class="line"><span class="comment"> * Description:</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        AnnotationConfigApplicationContext context = <span class="keyword">new</span> AnnotationConfigApplicationContext(AopConfig<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">        FuncOneService funcOneService = context.getBean(FuncOneService<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">        FuncTwoService funcTwoService = context.getBean(FuncTwoService<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">        <span class="comment">// 注解式拦截</span></span><br><span class="line">        funcOneService.show();</span><br><span class="line">        <span class="comment">// 方法规则式拦截</span></span><br><span class="line">        funcTwoService.show();</span><br><span class="line">        funcTwoService.test();</span><br><span class="line"></span><br><span class="line">        context.close();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>result</strong><br><img src="https://img-blog.csdnimg.cn/20191011162149201.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0NhY3R1c19Mcmc=,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="http://www.liruigao.top/index.html">主页</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/article.html">创作</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/photos.html">摄影</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/blog.html">博客</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/about.html">关于我</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/contact.html">联系我</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#一、依赖注入"><span class="toc-number">1.</span> <span class="toc-text">一、依赖注入</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-依赖注入的概念："><span class="toc-number">1.1.</span> <span class="toc-text">1.依赖注入的概念：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-依赖注入的主要目的："><span class="toc-number">1.2.</span> <span class="toc-text">2.依赖注入的主要目的：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-具体实现"><span class="toc-number">1.3.</span> <span class="toc-text">3.具体实现</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#4-涉及到的注解（推荐注解的方式，xml效率低且复杂）"><span class="toc-number">1.4.</span> <span class="toc-text">4.涉及到的注解（推荐注解的方式，xml效率低且复杂）</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#5-Ioc-amp-Di-Demo"><span class="toc-number">1.5.</span> <span class="toc-text">5.Ioc&amp;Di Demo</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#二、Java配置"><span class="toc-number">2.</span> <span class="toc-text">二、Java配置</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-Java配置简介"><span class="toc-number">2.1.</span> <span class="toc-text">1.Java配置简介</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-什么时候使用Java配置"><span class="toc-number">2.2.</span> <span class="toc-text">2.什么时候使用Java配置</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-JavaConfig-demo"><span class="toc-number">2.3.</span> <span class="toc-text">3.JavaConfig demo</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#三、AOP"><span class="toc-number">3.</span> <span class="toc-text">三、AOP</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-AOP的由来"><span class="toc-number">3.1.</span> <span class="toc-text">1.AOP的由来</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-AOP的目的"><span class="toc-number">3.2.</span> <span class="toc-text">2.AOP的目的</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-涉及到的注解"><span class="toc-number">3.3.</span> <span class="toc-text">3.涉及到的注解</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#4-AOP-Demo"><span class="toc-number">3.4.</span> <span class="toc-text">4.AOP Demo</span></a></li></ol></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://www.liruigao.top/cactus_blog/2020/01/10/Spring%E5%9F%BA%E7%A1%80%E9%85%8D%E7%BD%AE/" target="_blank" rel="noopener"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://www.liruigao.top/cactus_blog/2020/01/10/Spring%E5%9F%BA%E7%A1%80%E9%85%8D%E7%BD%AE/&text=Spring基础配置" target="_blank" rel="noopener"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://www.liruigao.top/cactus_blog/2020/01/10/Spring%E5%9F%BA%E7%A1%80%E9%85%8D%E7%BD%AE/&title=Spring基础配置" target="_blank" rel="noopener"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://www.liruigao.top/cactus_blog/2020/01/10/Spring%E5%9F%BA%E7%A1%80%E9%85%8D%E7%BD%AE/&is_video=false&description=Spring基础配置" target="_blank" rel="noopener"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Spring基础配置&body=Check out this article: http://www.liruigao.top/cactus_blog/2020/01/10/Spring%E5%9F%BA%E7%A1%80%E9%85%8D%E7%BD%AE/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://www.liruigao.top/cactus_blog/2020/01/10/Spring%E5%9F%BA%E7%A1%80%E9%85%8D%E7%BD%AE/&title=Spring基础配置" target="_blank" rel="noopener"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://www.liruigao.top/cactus_blog/2020/01/10/Spring%E5%9F%BA%E7%A1%80%E9%85%8D%E7%BD%AE/&title=Spring基础配置" target="_blank" rel="noopener"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://www.liruigao.top/cactus_blog/2020/01/10/Spring%E5%9F%BA%E7%A1%80%E9%85%8D%E7%BD%AE/&title=Spring基础配置" target="_blank" rel="noopener"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://www.liruigao.top/cactus_blog/2020/01/10/Spring%E5%9F%BA%E7%A1%80%E9%85%8D%E7%BD%AE/&title=Spring基础配置" target="_blank" rel="noopener"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://www.liruigao.top/cactus_blog/2020/01/10/Spring%E5%9F%BA%E7%A1%80%E9%85%8D%E7%BD%AE/&name=Spring基础配置&description=" target="_blank" rel="noopener"><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://news.ycombinator.com/submitlink?u=http://www.liruigao.top/cactus_blog/2020/01/10/Spring%E5%9F%BA%E7%A1%80%E9%85%8D%E7%BD%AE/&t=Spring基础配置" target="_blank" rel="noopener"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2020 liruigao.top
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="http://www.liruigao.top/index.html">主页</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/article.html">创作</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/photos.html">摄影</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/blog.html">博客</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/about.html">关于我</a></li>
+         
+          <li><a href="http://www.liruigao.top/web/contact.html">联系我</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+<link rel="stylesheet" href="/cactus_blog/lib/font-awesome/css/all.min.css">
+
+
+<link rel="stylesheet" href="/cactus_blog/lib/justified-gallery/css/justifiedGallery.min.css">
+
+
+    <!-- jquery -->
+
+<script src="/cactus_blog/lib/jquery/jquery.min.js"></script>
+
+
+<script src="/cactus_blog/lib/justified-gallery/js/jquery.justifiedGallery.min.js"></script>
+
+<!-- clipboard -->
+
+  
+<script src="/cactus_blog/lib/clipboard/clipboard.min.js"></script>
+
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="far fa-clone"></i>';
+    btn += '</span>'; 
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/cactus_blog/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Google Analytics -->
+
+<!-- Baidu Analytics -->
+
+<!-- Disqus Comments -->
+
+
+</body>
+</html>
