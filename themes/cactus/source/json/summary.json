@@ -7,11 +7,11 @@
     "path": "2020/01/10/Spring高级话题-测试/"
   },
   {
-    "title": "Spring高级话题-@Enable*注解的工作原理",
+    "title": "Spring高级话题-@Enable-注解的工作原理",
     "date": "2020-01-10",
     "content": "Spring 系列内容",
     "image": "http://www.liruigao.top/cactus_blog/2020/01/10/Spring-概述/spring.jpeg",
-    "path": "2020/01/10/Spring高级话题-@Enable-注解的工作原理/"
+    "path": "2020/01/10/Spring高级话题-Enable-注解的工作原理/"
   },
   {
     "title": "Spring高级话题-元注解与组合注解",
