@@ -14,7 +14,7 @@
 <meta property="og:description" content="一、顺序消息的实现1.全局顺序消息要保证全局顺序消息，需要先把 Topic 的读写队列数设置为 1，然后 Producer 和 Consumer 的并发设置也要是1。在发送端，要做到 把同一业务 ID 的消息发送到同一个 Message Queue（使用 MessageQueueSelector类） 2.部分顺序消息在消费过程中，要做到从 同一个 Message Queue 读取的消息不被并发处理">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2020-01-09T12:36:15.000Z">
-<meta property="article:modified_time" content="2020-01-10T02:50:13.617Z">
+<meta property="article:modified_time" content="2020-01-09T12:36:26.087Z">
 <meta property="article:author" content="liruigao.top">
 <meta name="twitter:card" content="summary">
     
